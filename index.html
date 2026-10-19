@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Paint Mix Pro — ဆေးစပ်နည်း</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script async src="https://sad.adsgram.ai/js/sad.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#14161d;--card:#1f2330;--card2:#262b3b;--accent:#ff9f1c;--accent2:#ffc857;--text:#f5f5f5;--muted:#9aa0b4;--green:#2ec55e;--red:#e5484d;--blue:#3b82f6}
+body{font-family:-apple-system,'Segoe UI',Roboto,'Pyidaungsu Font','Myanmar3',sans-serif;background:radial-gradient(1200px 600px at 50% -10%,#232838 0%,var(--bg) 60%);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:90px}
+.header{position:sticky;top:0;z-index:20;background:rgba(20,22,29,.95);backdrop-filter:blur(8px);padding:14px 16px;border-bottom:1px solid #2c3145;display:flex;align-items:center;gap:10px}
+.header .logo{font-size:28px}
+.header h1{font-size:19px;font-weight:800}
+.header h1 small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#191d28;border-top:1px solid #2c3145;display:flex;z-index:20}
+.tab-btn{flex:1;padding:12px 4px 14px;background:none;border:none;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer}
+.tab-btn .ico{font-size:22px;display:block;margin-bottom:2px}
+.tab-btn.active{color:var(--accent)}
+.page{display:none;padding:16px}
+.page.active{display:block}
+.stepper{display:flex;gap:6px;margin-bottom:16px}
+.step-dot{flex:1;height:6px;border-radius:3px;background:#2c3145}
+.step-dot.done{background:var(--accent)}
+.step-title{font-size:18px;font-weight:800;margin-bottom:4px}
+.step-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.brand-btn{background:var(--card);border:2px solid #2c3145;border-radius:14px;padding:18px 10px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;min-height:72px}
+.brand-btn:active{transform:scale(.96)}
+.brand-btn.sel{border-color:var(--accent);background:#2b2417}
+.brand-btn small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:4px}
+.model-list{display:flex;flex-direction:column;gap:10px}
+.model-btn{background:var(--card);border:2px solid #2c3145;border-radius:14px;padding:16px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;text-align:left;min-height:60px}
+.model-btn:active{transform:scale(.98)}
+.model-btn.sel{border-color:var(--accent);background:#2b2417}
+.model-btn small{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:3px}
+.field{background:var(--card);border:2px solid #2c3145;border-radius:14px;padding:16px;margin-bottom:12px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:600}
+.field input,.field textarea,.field select{width:100%;background:#14161d;border:1px solid #3a4058;border-radius:10px;color:var(--text);font-size:16px;padding:14px;font-family:inherit}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+.wmi-hint{font-size:13px;margin-top:10px;padding:10px;border-radius:10px;background:#1a2b1a;border:1px solid #2ec55e55;display:none}
+.wmi-hint.show{display:block}
+.btn{display:block;width:100%;background:linear-gradient(180deg,var(--accent2),var(--accent));border:none;border-radius:14px;color:#1a1206;font-size:17px;font-weight:800;padding:16px;margin-top:12px;cursor:pointer;min-height:56px}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--card);color:var(--text);border:2px solid #2c3145}
+.btn:disabled{opacity:.5}
+.back-link{background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;padding:10px 0;cursor:pointer;margin-bottom:6px}
+.color-list{display:flex;flex-direction:column;gap:10px}
+.color-btn{display:flex;align-items:center;gap:14px;background:var(--card);border:2px solid #2c3145;border-radius:14px;padding:12px;cursor:pointer;min-height:72px;text-align:left;width:100%;color:var(--text)}
+.color-btn:active{transform:scale(.98)}
+.color-btn.sel{border-color:var(--accent)}
+.swatch{width:56px;height:56px;border-radius:4px;flex-shrink:0;border:2px solid rgba(255,255,255,.25);box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
+.color-info{flex:1}
+.color-info .cn{font-size:15px;font-weight:700}
+.color-info .cc{font-size:12px;color:var(--accent);font-weight:700;margin-top:2px}
+.color-info .ce{font-size:11px;color:var(--muted)}
+.code-card{background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:24px 16px;text-align:center;margin:16px 0}
+.code-card .lbl{font-size:13px;color:var(--muted)}
+.code-card .code{font-size:34px;font-weight:800;color:var(--accent);margin:8px 0;letter-spacing:1px}
+.code-card .cname{font-size:16px;font-weight:600}
+.ad-box{background:var(--card);border-radius:16px;padding:24px 16px;text-align:center;margin:16px 0}
+.ad-sim{background:#0d0f14;border-radius:12px;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px}
+.ad-sim .ad-tag{font-size:11px;color:var(--muted);letter-spacing:2px}
+.ad-sim .ad-title{font-size:20px;font-weight:800;color:var(--accent2)}
+.ad-sim .ad-timer{font-size:44px;font-weight:800}
+.progress{height:8px;background:#2c3145;border-radius:4px;overflow:hidden;width:100%;max-width:260px}
+.progress>div{height:100%;background:var(--accent);width:0%;transition:width .2s}
+.formula-card{background:var(--card);border-radius:16px;padding:18px;margin:16px 0}
+.formula-card h3{font-size:16px;margin-bottom:12px}
+.comp{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #2c3145;font-size:15px}
+.comp:last-child{border-bottom:none}
+.comp .pct{font-weight:800;color:var(--accent)}
+.warn{background:#2b1a1a;border:1px solid #e5484d55;border-radius:12px;padding:12px;font-size:13px;color:#ffb4b4;margin:12px 0;line-height:1.6}
+.tip{background:#1a2b1a;border:1px solid #2ec55e55;border-radius:12px;padding:12px;font-size:13px;color:#b4ffc4;margin:12px 0;line-height:1.6}
+.nb-item{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #2c3145}
+.nb-item .t{font-size:15px;font-weight:700}
+.nb-item .m{font-size:12px;color:var(--muted);margin-top:4px}
+.nb-item .acts{display:flex;gap:8px;margin-top:10px}
+.nb-item .acts button{flex:1;padding:10px;border-radius:10px;border:1px solid #3a4058;background:var(--card2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;min-height:44px}
+.nb-item .acts button.del{border-color:#e5484d66;color:#ff8a8a}
+.empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:14px;line-height:1.8}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.modal.show{display:flex}
+/* ---- recipes section ---- */
+.search-field{background:var(--card);border:2px solid #2c3145;border-radius:14px;padding:4px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.search-field input{flex:1;background:none;border:none;color:var(--text);font-size:16px;padding:12px 0;font-family:inherit}
+.search-field input:focus{outline:none}
+.chip-row{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;-webkit-overflow-scrolling:touch}
+.chip{flex-shrink:0;padding:10px 16px;border-radius:20px;border:2px solid #2c3145;background:var(--card);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;min-height:44px}
+.chip.sel{border-color:var(--accent);color:var(--accent)}
+.big-swatch{width:120px;height:120px;border-radius:12px;border:3px solid rgba(255,255,255,.3);box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);margin:6px auto 14px;display:block}
+.xl-swatch{width:170px;height:170px;border-radius:18px;border:5px solid #ffffff;box-shadow:0 0 0 3px #000,0 4px 18px rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.35);margin:10px auto 16px;display:block}
+.same-paint{background:rgba(46,197,94,.13);border:2px solid var(--green);border-radius:12px;padding:12px 14px;text-align:center;font-size:16px;margin:12px 0;color:var(--text)}
+.fcomp{padding:10px 0;border-bottom:1px solid #2c3145}
+.fcomp:last-child{border-bottom:none}
+.frow{display:flex;justify-content:space-between;align-items:center;font-size:15px;margin-bottom:7px;gap:8px}
+.frow .pct{font-weight:800;color:var(--accent);flex-shrink:0}
+.pbar{height:10px;background:#14161d;border-radius:5px;overflow:hidden;border:1px solid #2c3145}
+.pbar>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:5px;transition:width .4s}
+.lock-wrap{text-align:center;padding:18px 8px}
+.lock-wrap .lk{font-size:44px;margin-bottom:8px}
+.lock-wrap p{font-size:14px;color:var(--muted);margin-bottom:14px;line-height:1.7}
+.recipe-meta{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0 4px}
+.recipe-meta span{font-size:12px;color:var(--muted);background:var(--card2);border:1px solid #2c3145;padding:6px 12px;border-radius:14px}
+.sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;padding:20px 16px 30px}
+.sheet h2{font-size:18px;margin-bottom:14px}
+.row2{display:flex;gap:10px}
+.row2 .field{flex:1}
+/* ---- 5-can system ---- */
+.fivecan{background:linear-gradient(160deg,#262b3b,#1c2030);border:2px solid var(--accent);border-radius:18px;padding:18px 14px;margin-bottom:16px}
+.fivecan h2{font-size:17px;margin-bottom:6px}
+.fivecan .tag{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:12px}
+.cans{display:flex;gap:8px;justify-content:space-between;margin-bottom:12px}
+.can{flex:1;text-align:center;background:#14161d;border:2px solid #2c3145;border-radius:12px;padding:10px 4px;cursor:pointer;min-height:76px;color:var(--text)}
+.can .ce{font-size:26px;display:block;margin-bottom:4px}
+.can .cn{font-size:11px;font-weight:700;line-height:1.4}
+.can.sel{border-color:var(--green);background:#16241a}
+.can.opt{border-style:dashed}
+.theory{font-size:12.5px;color:var(--muted);line-height:2;background:#14161d;border-radius:12px;padding:12px;margin-bottom:12px}
+.theory b{color:var(--text)}
+.calc-res{background:#16241a;border:1px solid #2ec55e55;border-radius:12px;padding:12px;font-size:14px;font-weight:700;color:#b4ffc4;margin-top:10px;display:none;line-height:1.7}
+.calc-res.show{display:block}
+/* ---- code cross-reference ---- */
+.code-search-box{background:var(--card);border:2px solid var(--accent);border-radius:18px;padding:16px 14px;margin-bottom:16px}
+.code-group{margin-top:10px}
+.code-group-head{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid #2c3145;border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:14px;line-height:1.5}
+.swatch.sm{width:36px;height:36px;min-width:36px}
+.code-res{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:2px solid #2c3145;border-radius:12px;padding:10px 12px;margin-bottom:8px;color:var(--text);cursor:pointer;font-size:14px;font-family:inherit}
+.code-res:active{transform:scale(.98)}
+/* ---- paint school ---- */
+.lvl-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:2px solid #2c3145;border-radius:16px;padding:16px;margin-bottom:12px;color:var(--text);cursor:pointer;font-family:inherit}
+.lvl-card:active{transform:scale(.98)}
+.lvl-ico{font-size:38px;flex-shrink:0}
+.lvl-info{flex:1;min-width:0}
+.lvl-t{font-size:16px;font-weight:800}
+.lvl-e{font-size:12px;color:var(--muted)}
+.lvl-p{font-size:12px;color:var(--muted);margin-top:4px}
+.lvl-done{font-size:26px;flex-shrink:0}
+.les-no{width:44px;height:44px;border-radius:12px;background:var(--card2);border:1px solid #2c3145;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;color:var(--accent)}
+.les-p{font-size:15px;line-height:1.9;margin:12px 0}
+.les-p b{color:var(--accent2)}
+.mix-lbl{text-align:center;font-size:13px;color:var(--muted);font-weight:600;margin:8px 0 2px}
+.mix-row{display:flex;gap:8px;justify-content:center;margin:6px 0}
+.mix-can{flex:1;max-width:88px;background:var(--card);border:2px solid #2c3145;border-radius:12px;padding:10px 4px;color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.mix-can span{font-size:26px;display:block;margin-bottom:4px}
+.mix-can.sel1{border-color:var(--accent);background:#2b2417}
+.mix-can.sel2{border-color:var(--blue);background:#17202b}
+.mix-plus{text-align:center;font-size:24px;color:var(--muted);margin:2px 0}
+.mix-res{text-align:center;margin-top:12px;background:var(--card);border-radius:16px;padding:16px}
+.mix-name{font-size:20px;font-weight:800;margin-top:8px}
+.quiz-q{font-size:17px;font-weight:700;background:var(--card);border:2px solid #2c3145;border-radius:14px;padding:18px;margin:14px 0;line-height:1.8}
+.quiz-opt{display:block;width:100%;text-align:left;background:var(--card);border:2px solid #2c3145;border-radius:12px;padding:15px;font-size:15px;color:var(--text);margin-bottom:10px;cursor:pointer;font-family:inherit}
+.quiz-opt.qok{border-color:var(--green);background:#16241a}
+.quiz-opt.qbad{border-color:var(--red);background:#2b1a1a}
+.quiz-opt:disabled{cursor:default}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo">🎨</div>
+  <h1>Paint Mix Pro<small>ဆေးစပ်နည်း — ဆိုင်ကယ်/ကား ဆေးဆရာအတွက်</small></h1>
+</div>
+
+<!-- ============ FIND COLOR PAGE ============ -->
+<div class="page active" id="page-find">
+  <div class="stepper" id="stepper"></div>
+  <div id="wizard"></div>
+</div>
+
+<!-- ============ NOTEBOOK PAGE ============ -->
+<div class="page" id="page-nb">
+  <div class="step-title">📓 ကိုယ်ပိုင် Formula မှတ်တမ်း</div>
+  <div class="step-sub">ကိုယ်တိုင် စပ်ထားတဲ့ ဆေးအချိုးတွေ သိမ်းထားပါ</div>
+  <div id="nbList"></div>
+  <button class="btn" onclick="openNbForm()">＋ အသစ် ထည့်မယ်</button>
+</div>
+
+<!-- ============ RECIPES PAGE ============ -->
+<div class="page" id="page-recipes">
+  <div id="recipesBody"></div>
+</div>
+
+<!-- ============ SCHOOL PAGE ============ -->
+<div class="page" id="page-school">
+  <div id="schoolBody"></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('find',this)"><span class="ico">🔍</span>အရောင်ရှာ</button>
+  <button class="tab-btn" onclick="showTab('recipes',this)"><span class="ico">🎨</span>စပ်နည်း</button>
+  <button class="tab-btn" onclick="showTab('nb',this)"><span class="ico">📓</span>မှတ်တမ်း</button>
+  <button class="tab-btn" onclick="showTab('school',this)"><span class="ico">🎓</span>ဆေးပညာ</button>
+</div>
+
+<div class="modal" id="nbModal"><div class="sheet" id="nbSheet"></div></div>
+
+<script>
+/* ================= ADSGRAM CONFIG ================= */
+/* Set your AdsGram Rewarded block ID here to enable real ads.
+   Empty string = demo 5s simulated ad (v1). */
+const ADSGRAM_BLOCK_ID = '';
+
+/* ================= DATA ================= */
+const BRANDS=[
+ {id:'honda',name:'Honda',mm:'ဟွန်ဒါ',note:'Wave / Dream / Click / PCX / ADV / Scoopy / AirBlade / Lead / Dio / CB / Cub'},
+ {id:'yamaha',name:'Yamaha',mm:'ရာမာဟာ',note:'FZ / Exciter / Sirius'},
+ {id:'suzuki',name:'Suzuki',mm:'ဆူဇူကီး',note:'Gixxer / Raider'},
+ {id:'kawasaki',name:'Kawasaki',mm:'ကာဝါစကီး',note:'Ninja / KLX'},
+ {id:'haojue',name:'Haojue',mm:'ဟောင်ကျူး',note:'HJ125 / GN125 / DR'},
+ {id:'bajaj',name:'Bajaj',mm:'ဘာဂျက်',note:'Pulsar / Boxer / Discover'},
+ {id:'tvs',name:'TVS',mm:'တီဗွီအက်စ်',note:'Apache RTR'},
+ {id:'hero',name:'Hero',mm:'ဟီရို',note:'Splendor / HF Deluxe'},
+ {id:'re',name:'Royal Enfield',mm:'ရော်ရယ် အန်းဖီး',note:'Classic 350'},
+ {id:'vinfast',name:'VinFast',mm:'ဗင်ဖတ်',note:'Evo / Feliz (လျှပ်စစ်)'},
+ {id:'china',name:'Other Chinese',mm:'တရုတ် အခြား',note:'Lifan / Zongshen / Dayun'},
+];
+const WMI={RLH:['honda','Honda Vietnam 🇻🇳'],JH2:['honda','Honda Japan 🇯🇵'],MLH:['honda','Honda Thailand 🇹🇭'],'1HF':['honda','Honda USA 🇺🇸'],RLC:['yamaha','Yamaha Vietnam 🇻🇳'],JYA:['yamaha','Yamaha Japan 🇯🇵'],MH3:['yamaha','Yamaha Thailand 🇹🇭'],JS1:['suzuki','Suzuki Japan 🇯🇵'],JKB:['kawasaki','Kawasaki Japan 🇯🇵'],LC6:['haojue','Haojue China 🇨🇳'],LF3:['china','Lifan China 🇨🇳'],LZS:['china','Zongshen China 🇨🇳'],LCE:['china','CFMoto China 🇨🇳'],MBL:['hero','Hero India 🇮🇳'],MD2:['bajaj','Bajaj India 🇮🇳'],ME1:['re','Royal Enfield India 🇮🇳'],ME3:['re','Royal Enfield India 🇮🇳'],RLL:['vinfast','VinFast Vietnam 🇻🇳'],RP8:['china','Piaggio Vietnam 🇻🇳']};
+/* colors: {code, mm (Myanmar name), en, hex, formula:[{toner,pct}], note} */
+const MODELS={
+ honda:[
+  {name:'Wave 110i / 125i',mm:'ဝေ့',colors:[
+   {code:'NH-1',mm:'အမည်း',en:'Black',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'Solid — 2K 2:1 + thinner 10%'},
+   {code:'NH-731P',mm:'အနက်ပုလဲ',en:'Crystal Black Pearl',hex:'#23232b',f:[['🔵 အပြာ',3],['⚫ အမည်း',85],['✨ ပုလဲ/ငွေရောင်',12]],n:'Pearl effect — spray test card first'},
+   {code:'R-158P',mm:'အနီပုလဲ',en:'Pure Red Metallic',hex:'#a31212',f:[['🔴 အနီ',95],['⚫ အမည်း',2],['✨ ပုလဲ/ငွေရောင်',3]],n:'Candy depth — 2 coats min'},
+   {code:'NH-105',mm:'အနက် Matte',en:'Matt Black',hex:'#2b2b2b',f:[['⚫ အမည်း',100]],n:'Matte clear only — NO gloss!'},
+   {code:'B-183M',mm:'အပြာရင့် Metallic',en:'Petrol Blue Metallic',hex:'#1c4d6e',f:[['🔵 အပြာ',80],['⚫ အမည်း',12],['✨ ပုလဲ/ငွေရောင်',8]],n:'Metallic — even spray passes'},
+   {code:'NH-2M',mm:'ငွေရောင်',en:'Silver Metallic',hex:'#c0c4cc',f:[['⚪ အဖြူ',8],['✨ ပုလဲ/ငွေရောင်',92]],n:'Silver — watch for mottling'},
+   {code:'—',mm:'အနီတောက် Candy',en:'Candy Scintillate Red (TH)',hex:'#9d1414',f:[['🔴 အနီ',90],['⚫ အမည်း',10]],n:'Thai Wave 125i — candy, even coats'},
+   {code:'—',mm:'အပြာရင့် ပုလဲ',en:'Pearl Nightfall Blue (TH)',hex:'#1c3a6e',f:[['🔵 အပြာ',80],['⚫ အမည်း',8],['✨ ပုလဲ/ငွေရောင်',12]],n:'Thai Wave 125i — pearl blue'},
+   {code:'—',mm:'ရွှေရောင် Metallic',en:'Extravagant Gold Metallic (TH)',hex:'#b8963e',f:[['🔴 အနီ',14],['🟡 အဝါ',68],['⚫ အမည်း',2],['✨ ပုလဲ/ငွေရောင်',16]],n:'Thai Wave 125i — gold metallic'},
+   {code:'—',mm:'အပြာပြိုင်',en:'Racing Blue (TH)',hex:'#0f3fa0',f:[['🔵 အပြာ',98],['⚫ အမည်း',2]],n:'Thai Wave 125i — racing blue'},
+   {code:'NH-138',mm:'အဖြူ',en:'Shasta White (TH)',hex:'#f2f2f0',f:[['⚪ အဖြူ',100]],n:'Solid white'}]},
+  {name:'Wave 100 / Alpha',mm:'ဝေ့ 100',colors:[
+   {code:'—',mm:'ဘဲခေါင်းစိမ်း',en:'Duck-head Green — Wave 100 (iridescent deep metallic green)',hex:'#16402c',f:[['🔵 အပြာ',34],['🟡 အဝါ',33],['⚫ အမည်း',27],['✨ ပုလဲ/ငွေရောင်',6]],n:'စမှတ် — မျက်စိနဲ့ ချိန်ညှိပါ။ ဘဲခေါင်း တောက်ပမှု က ရွှေစိမ်းပုလဲ က နေ လာ တယ်။ Base 2-3 coat → ပုလဲ mid-coat ပါးပါး → Clear။ Gun ညီညီ မှုတ်၊ mottle သတိထား!'},
+   {code:'—',mm:'ပုလဲဖြူ',en:'Pearl White — Wave 100 (2-stage tricoat)',hex:'#f5f5f0',f:[['⚪ အဖြူ',85],['✨ ပုလဲ/ငွေရောင်',15]],n:'စမှတ် — ရိုးရိုး အဖြူ မဟုတ်! 2-stage: အဖြူ solid 2 coat အရင် → ပုလဲ mid-coat ပါးပါး 1-2 coat → clear။ ပုလဲ ထူ သွား ရင် အကွက် လိုက် မည်း ပြ'},
+   {code:'NH1',mm:'အမည်း',en:'Black (VN)',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'Solid black'},
+   {code:'R203M',mm:'အနီရင့်',en:'Dark Red Metallic (VN)',hex:'#7a1212',f:[['🔴 အနီ',77],['⚫ အမည်း',23]],n:'Vietnam Wave Alpha color'},
+   {code:'PB421M',mm:'ငွေပြာ',en:'Silver-Blue Metallic (VN)',hex:'#9fb3c8',f:[['🔵 အပြာ',14],['⚪ အဖြူ',6],['✨ ပုလဲ/ငွေရောင်',80]],n:'Vietnam Wave Alpha color'},
+   {code:'—',mm:'အစိမ်းရင့် (VN)',en:'Dark Green (Vietnam)',hex:'#1f4d2e',f:[['🔵 အပြာ',38],['🟡 အဝါ',37],['⚫ အမည်း',24],['⚪ အဖြူ',1]],n:'Vietnam Wave Alpha — eye-match advised'},
+   {code:'—',mm:'အပြာ (VN)',en:'Blue (Vietnam)',hex:'#1e5aa8',f:[['🔵 အပြာ',90],['⚪ အဖြူ',10]],n:'Vietnam Wave Alpha — eye-match advised'}]},
+  {name:'Dream 125',mm:'ဒရင်း',colors:[
+   {code:'—',mm:'ကျောက်ပြာ',en:'Dark Green — Thai Dream (stone-blue nickname)',hex:'#1f4d2e',f:[['🔵 အပြာ',38],['🟡 အဝါ',37],['⚫ အမည်း',24],['⚪ အဖြူ',1]],n:'မြန်မာ နာမည် ကျောက်ပြာ — ထိုင်း ဒရင်း နာမည်ကြီး အရောင်၊ မျက်စိနဲ့ ညှိပါ'},
+   {code:'—',mm:'အပြာ (2006)',en:'Blue — Dream 2006 Thai',hex:'#1e5aa8',f:[['🔵 အပြာ',88],['⚪ အဖြူ',12]],n:'2006 ထိုင်း ဒရင်း အပြာ — eye-match advised'},
+   {code:'NH-1',mm:'အမည်း',en:'Black',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'Solid'},
+   {code:'R-158P',mm:'အနီ',en:'Red',hex:'#a31212',f:[['🔴 အနီ',95],['⚫ အမည်း',2],['✨ ပုလဲ/ငွေရောင်',3]],n:'Classic Dream red'},
+   {code:'NH-138',mm:'အဖြူ',en:'Shasta White',hex:'#f2f2f0',f:[['⚪ အဖြူ',100]],n:'Thai Dream white'},
+   {code:'—',mm:'စိမ်းမြရည် Emerald',en:'Emerald Green — Dream 2027',hex:'#0f6b4a',f:[['🔵 အပြာ',41],['🟡 အဝါ',43],['⚫ အမည်း',13],['✨ ပုလဲ/ငွေရောင်',3]],n:'Dream 2027 new color — eye-match'},
+   {code:'—',mm:'မီးခိုး',en:'Artistry Gray — Dream 2027',hex:'#6b6f75',f:[['⚫ အမည်း',32],['⚪ အဖြူ',68]],n:'Dream 2027 new color — eye-match'},
+   {code:'—',mm:'အနီရဲ (Pride)',en:'Pride Red — Dream 2027',hex:'#a31212',f:[['🔴 အနီ',98],['⚫ အမည်း',2]],n:'Dream 2027 new color — eye-match'}]},
+  {name:'Click 125/160',mm:'ကလစ်',colors:[
+   {code:'NH-731P',mm:'အနက်ပုလဲ',en:'Crystal Black Pearl',hex:'#23232b',f:[['🔵 အပြာ',3],['⚫ အမည်း',85],['✨ ပုလဲ/ငွေရောင်',12]],n:''},
+   {code:'NH-138',mm:'အဖြူ',en:'Shasta White',hex:'#f2f2f0',f:[['⚪ အဖြူ',100]],n:'Solid white'},
+   {code:'R-176C',mm:'အနီ Tricoat',en:'Red Tricoat',hex:'#8f0f0f',f:[['🔴 အနီ',89],['⚫ အမည်း',11]],n:'Tricoat — 3 stage!'},
+   {code:'—',mm:'အဖြူပုလဲ',en:'Pearl Horizon White',hex:'#f4f4f0',f:[['⚪ အဖြူ',90],['✨ ပုလဲ/ငွေရောင်',10]],n:'Click 125i — pearl white'},
+   {code:'—',mm:'အနက် Metallic',en:'Asteroid Black Metallic',hex:'#1f2126',f:[['⚫ အမည်း',88],['✨ ပုလဲ/ငွေရောင်',12]],n:'Click 125i — metallic black'},
+   {code:'R-4C',mm:'အနီပန်းရောင် Candy',en:'Candy Rosy Red',hex:'#a3163a',f:[['🔴 အနီ',90],['⚫ အမည်း',10]],n:'Click 125i — candy rosy red'},
+   {code:'—',mm:'စစ်စိမ်းရောင်',en:'Army Green — Click 125 (military)',hex:'#4a4d2f',f:[['🟡 အဝါ',38],['🔵 အပြာ',32],['⚫ အမည်း',28],['✨ ပုလဲ/ငွေရောင်',2]],n:'စမှတ် — စစ်စိမ်းရောင်! အစိမ်း + အမည်း များ များ = drab!'},
+   {code:'—',mm:'အပြာစို Candy',en:'Candy Blue — Click 150 (vivid wet blue)',hex:'#0f4fd8',f:[['🔵 အပြာ',86],['✨ ပုလဲ/ငွေရောင်',14]],n:'စမှတ် — Candy tone! စိုစို ရွှဲရွှဲ အပြာ! 3-stage: ငွေရောင် base → အပြာ transparent → clear!'},
+   {code:'—',mm:'အနက်ခြောက်',en:'Dry Black — Click 160 (matte black)',hex:'#1e1e1e',f:[['⚫ အမည်း',100]],n:'Click 160 — အနက်ခြောက်! matte clear ONLY — gloss လုံး ဝ မ ရ!'}]},
+  {name:'PCX 125/150/160',mm:'ပီစီအက်စ်',colors:[
+   {code:'—',mm:'အနက်ပုလဲ',en:'Poseidon Black Metallic',hex:'#1c1e22',f:[['⚫ အမည်း',80],['✨ ပုလဲ/ငွေရောင်',15],['🔵 အပြာ',5]],n:'PCX160 — metallic black'},
+   {code:'—',mm:'ငွေပုလဲ',en:'Pearl Jasmine Silver',hex:'#d4d8dc',f:[['⚪ အဖြူ',15],['✨ ပုလဲ/ငွေရောင်',85]],n:'PCX160 — pearl silver'},
+   {code:'—',mm:'အနီ Candy',en:'Candy Raster Red',hex:'#b01414',f:[['🔴 အနီ',92],['⚫ အမည်း',5],['✨ ပုလဲ/ငွေရောင်',3]],n:'PCX160 — candy red'},
+   {code:'—',mm:'ငွေ Matte',en:'Matte Cosmo Silver Metallic',hex:'#b8bcc0',f:[['⚪ အဖြူ',10],['✨ ပုလဲ/ငွေရောင်',85],['⚫ အမည်း',5]],n:'PCX160 — matte silver, matte clear only'},
+   {code:'—',mm:'မီးခိုး Matte',en:'Matt Dim Gray Metallic',hex:'#4a4d52',f:[['⚫ အမည်း',40],['⚪ အဖြူ',45],['✨ ပုလဲ/ငွေရောင်',15]],n:'PCX160 — matte gray, matte clear only'},
+   {code:'—',mm:'အနီရဲ Metallic',en:'Vortex Red Metallic',hex:'#a31212',f:[['🔴 အနီ',90],['⚫ အမည်း',5],['✨ ပုလဲ/ငွေရောင်',5]],n:'PCX160 RoadSync — red metallic'},
+   {code:'—',mm:'အဖြူပုလဲ',en:'Pearl Fadeless White',hex:'#f4f4f0',f:[['⚪ အဖြူ',88],['✨ ပုလဲ/ငွေရောင်',12]],n:'PCX160 RoadSync — pearl white'},
+   {code:'—',mm:'ခဲဖြူ',en:'Pencil White — PCX (grayish white)',hex:'#c9cdd2',f:[['⚪ အဖြူ',70],['⚫ အမည်း',18],['✨ ပုလဲ/ငွေရောင်',12]],n:'စမှတ် — ခဲမှုန့် လို မီးခိုး ဖျော့! အဖြူ ထဲ အမည်း နည်း နည်း!'},
+   {code:'—',mm:'ခဲနက်',en:'Pencil Black — PCX (graphite gray)',hex:'#3a3d42',f:[['⚫ အမည်း',72],['⚪ အဖြူ',16],['✨ ပုလဲ/ငွေရောင်',12]],n:'စမှတ် — ခဲသား လို မီးခိုး ရင့်! graphite!'}]},
+  {name:'ADV 150/160',mm:'အေဒီဗီ',colors:[
+   {code:'—',mm:'အမည်း Matte',en:'Matt Black',hex:'#222222',f:[['⚫ အမည်း',100]],n:'ADV160 — matte clear only, NO gloss!'},
+   {code:'—',mm:'မီးခိုးပုလဲ',en:'Pearl Smoky Grey',hex:'#6b6f75',f:[['⚫ အမည်း',35],['⚪ အဖြူ',55],['✨ ပုလဲ/ငွေရောင်',10]],n:'ADV160 — pearl gray'},
+   {code:'—',mm:'အနီရင့် Matte',en:'Matte Dahlia Red',hex:'#7a1522',f:[['🔴 အနီ',80],['⚫ အမည်း',18],['⚪ အဖြူ',2]],n:'ADV160 — matte red, matte clear only'},
+   {code:'—',mm:'အပြာပုလဲ',en:'Pearl Bosporus Blue',hex:'#1e3a6e',f:[['🔵 အပြာ',82],['⚫ အမည်း',10],['✨ ပုလဲ/ငွေရောင်',8]],n:'ADV160 2024 new — pearl blue'},
+   {code:'—',mm:'အစိမ်းရင့် Matte',en:'Matte Saber Green Metallic',hex:'#3d5a45',f:[['🔵 အပြာ',35],['🟡 အဝါ',38],['⚫ အမည်း',22],['✨ ပုလဲ/ငွေရောင်',5]],n:'ADV160 — matte green, matte clear only'},
+   {code:'—',mm:'အဖြူပုလဲ',en:'Pearl Fadeless White',hex:'#f4f4f0',f:[['⚪ အဖြူ',88],['✨ ပုလဲ/ငွေရောင်',12]],n:'ADV160 — pearl white'}]},
+  {name:'Scoopy 110',mm:'စကူပီ',colors:[
+   {code:'—',mm:'အမည်း Fashion',en:'Fashion Black',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'Scoopy — solid black'},
+   {code:'—',mm:'အနီ Fashion',en:'Fashion Red',hex:'#c01414',f:[['🔴 အနီ',95],['⚫ အမည်း',5]],n:'Scoopy — fashion red'},
+   {code:'—',mm:'အနီရဲ Candy',en:'Candy Red — Scoopy (vivid glossy)',hex:'#e6131c',f:[['🔴 အနီ',88],['✨ ပုလဲ/ငွေရောင်',12]],n:'စမှတ် — Candy tone! 3-stage: ငွေရောင် metallic base → အနီ transparent 2-3 coat → clear။ အရမ်း တောက် ပ!'},
+   {code:'—',mm:'ခရင်မ် Fashion',en:'Fashion Cream',hex:'#f5e6c8',f:[['⚪ အဖြူ',82],['🟡 အဝါ',16],['🔴 အနီ',2]],n:'Scoopy — cream'},
+   {code:'—',mm:'စိမ်းနု Fashion',en:'Fashion Mint',hex:'#b8e6d0',f:[['⚪ အဖြူ',75],['🔵 အပြာ',12],['🟡 အဝါ',13]],n:'Scoopy — mint'},
+   {code:'—',mm:'အဖြူ Prestige',en:'Prestige White',hex:'#f2f2f0',f:[['⚪ အဖြူ',100]],n:'Scoopy — prestige white'},
+   {code:'—',mm:'အစိမ်း Stylish',en:'Stylish Green',hex:'#3a7a5a',f:[['🔵 အပြာ',40],['🟡 အဝါ',45],['⚫ အမည်း',12],['⚪ အဖြူ',3]],n:'Scoopy — stylish green'},
+   {code:'—',mm:'အညိုနု Stylish',en:'Stylish Beige',hex:'#d8c8a8',f:[['⚪ အဖြူ',68],['🟡 အဝါ',26],['🔴 အနီ',4],['⚫ အမည်း',2]],n:'Scoopy — beige'}]},
+  {name:'Air Blade 125/160',mm:'အဲဘလိတ်',colors:[
+   {code:'—',mm:'အနီ-အမည်း',en:'Red-Black (AB125/160)',hex:'#8f0f0f',f:[['🔴 အနီ',85],['⚫ အမည်း',15]],n:'Air Blade — sporty red-black'},
+   {code:'—',mm:'ငွေနက်',en:'Silver Black (AB125/160)',hex:'#2b2d33',f:[['⚫ အမည်း',85],['✨ ပုလဲ/ငွေရောင်',15]],n:'Air Blade — metallic silver black'},
+   {code:'—',mm:'အနီ Candy',en:'Candy Luster Red (AB160)',hex:'#a3163a',f:[['🔴 အနီ',90],['⚫ အမည်း',8],['✨ ပုလဲ/ငွေရောင်',2]],n:'AB160 — candy red'},
+   {code:'—',mm:'အပြာရင့် ပုလဲ',en:'Pearl Dark Ash Blue (AB160)',hex:'#1e3a5a',f:[['🔵 အပြာ',75],['⚫ အမည်း',20],['✨ ပုလဲ/ငွေရောင်',5]],n:'AB160 — dark ash blue'},
+   {code:'—',mm:'မီးခိုး Matte',en:'Matte Dim Gray Metallic (AB160)',hex:'#4a4d52',f:[['⚫ အမည်း',40],['⚪ အဖြူ',45],['✨ ပုလဲ/ငွေရောင်',15]],n:'AB160 — matte gray, matte clear only'},
+   {code:'—',mm:'အစိမ်းနက်',en:'Green-Black (AB125/160)',hex:'#1f3d2e',f:[['🔵 အပြာ',38],['🟡 အဝါ',37],['⚫ အမည်း',24],['⚪ အဖြူ',1]],n:'Air Blade — green-black special'}]},
+  {name:'Lead 125',mm:'လိဒ်',colors:[
+   {code:'—',mm:'အနီ-အမည်း',en:'Red-Black (Lead)',hex:'#8f0f0f',f:[['🔴 အနီ',85],['⚫ အမည်း',15]],n:'Lead 125 standard — red-black'},
+   {code:'—',mm:'အဖြူ-အမည်း',en:'White-Black (Lead)',hex:'#f2f2f0',f:[['⚪ အဖြူ',100]],n:'Lead 125 premium — white'},
+   {code:'—',mm:'အညိုနက်',en:'Black-Brown (Lead)',hex:'#3a2a1e',f:[['🔴 အနီ',20],['🟡 အဝါ',25],['⚫ အမည်း',55]],n:'Lead 125 special — brown black'},
+   {code:'—',mm:'အပြာနက်',en:'Blue-Black (Lead)',hex:'#1e2a4a',f:[['🔵 အပြာ',70],['⚫ အမည်း',30]],n:'Lead 125 special — blue black'},
+   {code:'—',mm:'ငွေ Matte',en:'Silver-Black Matte (Lead)',hex:'#6b6f75',f:[['⚫ အမည်း',35],['⚪ အဖြူ',60],['✨ ပုလဲ/ငွေရောင်',5]],n:'Lead 125 special — matte silver, matte clear only'}]},
+  {name:'Dio 110/125',mm:'ဒီယို',colors:[
+   {code:'—',mm:'အနီ',en:'Imperial Red (Dio)',hex:'#b01414',f:[['🔴 အနီ',92],['⚫ အမည်း',8]],n:'Dio — imperial red'},
+   {code:'—',mm:'အပြာ Matte',en:'Matte Marvel Blue Metallic (Dio)',hex:'#1e4a8a',f:[['🔵 အပြာ',85],['⚫ အမည်း',10],['✨ ပုလဲ/ငွေရောင်',5]],n:'Dio — matte marvel blue, matte clear only'},
+   {code:'—',mm:'အနက်ပုလဲ',en:'Pearl Igneous Black (Dio)',hex:'#1c1e22',f:[['⚫ အမည်း',80],['✨ ပုလဲ/ငွေရောင်',20]],n:'Dio — pearl black'},
+   {code:'—',mm:'အဝါတောက် Metallic',en:'Dazzle Yellow Metallic (Dio)',hex:'#e6c814',f:[['🟡 အဝါ',88],['⚪ အဖြူ',5],['✨ ပုလဲ/ငွေရောင်',7]],n:'Dio — dazzle yellow'},
+   {code:'—',mm:'အပြာရင့် ပုလဲ',en:'Pearl Nightfall Blue (Dio)',hex:'#1c3a6e',f:[['🔵 အပြာ',80],['⚫ အမည်း',8],['✨ ပုလဲ/ငွေရောင်',12]],n:'Dio — nightfall blue'},
+   {code:'—',mm:'အစိမ်းပုလဲ',en:'Pearl Delightful Green (Dio)',hex:'#2a7a5a',f:[['🔵 အပြာ',42],['🟡 အဝါ',44],['⚫ အမည်း',10],['✨ ပုလဲ/ငွေရောင်',4]],n:'Dio — delightful green'},
+   {code:'—',mm:'အဝါ ပုလဲ',en:'Pearl Sports Yellow (Dio 125 IN)',hex:'#f0d020',f:[['🟡 အဝါ',85],['⚪ အဖြူ',8],['✨ ပုလဲ/ငွေရောင်',7]],n:'Dio 125 India — pearl sports yellow'},
+   {code:'—',mm:'မီးခိုး ပုလဲ',en:'Pearl Deep Ground Gray (Dio 125 IN)',hex:'#5a5d62',f:[['⚫ အမည်း',35],['⚪ အဖြူ',50],['✨ ပုလဲ/ငွေရောင်',15]],n:'Dio 125 India — pearl deep ground gray'}]},
+  {name:'CB150R',mm:'စီဘီ 150',colors:[
+   {code:'—',mm:'အမည်း',en:'Black (CB150R)',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'CB150R — solid black'},
+   {code:'R-81',mm:'အနီ Millennium',en:'Millennium Red (TH)',hex:'#a31212',f:[['🔴 အနီ',95],['⚫ အမည်း',5]],n:'CB150R ExMotion Thailand — R-81 family'},
+   {code:'—',mm:'မီးခိုး ပုလဲ',en:'Pearl Cadet Gray (TH)',hex:'#8a8d92',f:[['⚫ အမည်း',22],['⚪ အဖြူ',63],['✨ ပုလဲ/ငွေရောင်',15]],n:'CB150R ExMotion Thailand'},
+   {code:'—',mm:'အစိမ်းရင့် Matte',en:'Mat Laurel Green Metallic (TH)',hex:'#2e4a38',f:[['🔵 အပြာ',32],['🟡 အဝါ',33],['⚫ အမည်း',30],['✨ ပုလဲ/ငွေရောင်',5]],n:'CB150R ExMotion — matte clear only'},
+   {code:'—',mm:'အနက်ပုလဲ',en:'Asteroid Black Metallic (TH)',hex:'#1f2126',f:[['⚫ အမည်း',88],['✨ ပုလဲ/ငွေရောင်',12]],n:'CB150R ExMotion Thailand'},
+   {code:'—',mm:'အနက် Matte',en:'Matte Black (CB150R)',hex:'#2b2b2b',f:[['⚫ အမည်း',100]],n:'CB150R — matte clear only, NO gloss!'}]},
+  {name:'CBR150R',mm:'စီဘီအာ 150',colors:[
+   {code:'—',mm:'အနီ Racing',en:'Racing Red (CBR150R)',hex:'#c01414',f:[['🔴 အနီ',96],['⚫ အမည်း',4]],n:'CBR150R Indonesia/Thailand — racing red'},
+   {code:'—',mm:'အနီ/အမည်း Victory',en:'Victory Black Red (CBR150R)',hex:'#7a0f0f',f:[['🔴 အနီ',80],['⚫ အမည်း',20]],n:'CBR150R — victory black red'},
+   {code:'NH-105',mm:'အနက် Matte',en:'Matte Black (CBR150R)',hex:'#242424',f:[['⚫ အမည်း',100]],n:'CBR150R — matte clear only, NO gloss!'},
+   {code:'—',mm:'အနက် Dominator Matte',en:'Dominator Matte Black (CBR150R)',hex:'#1e1e1e',f:[['⚫ အမည်း',100]],n:'CBR150R special — matte clear only'}]},
+  {name:'CRF150L',mm:'စီအာအက်ဖ် 150',colors:[
+   {code:'—',mm:'အနီ Extreme',en:'Extreme Red (CRF150L)',hex:'#c01414',f:[['🔴 အနီ',96],['⚫ အမည်း',4]],n:'CRF150L Thailand/Indonesia — extreme red'},
+   {code:'NH-1',mm:'အမည်း',en:'Black (CRF150L)',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'CRF150L — solid black'}]},
+  {name:'Dash 125',mm:'ဒက်ရှ် 125',colors:[
+   {code:'NH-1',mm:'အမည်း',en:'Black (Dash 125)',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'Dash 125 Thailand/Malaysia'},
+   {code:'R-158P',mm:'အနီ',en:'Red (Dash 125)',hex:'#a31212',f:[['🔴 အနီ',92],['⚫ အမည်း',5],['✨ ပုလဲ/ငွေရောင်',3]],n:'Dash 125 — R-158P family'},
+   {code:'—',mm:'အပြာ',en:'Blue (Dash 125)',hex:'#1e3a8a',f:[['🔵 အပြာ',90],['⚫ အမည်း',10]],n:'Dash 125 — eye-match'}]},
+  {name:'Super Cub C125',mm:'စူပါကပ်',colors:[
+   {code:'—',mm:'အပြာပုလဲ',en:'Pearl Blue (C125)',hex:'#1e5aa8',f:[['🔵 အပြာ',88],['⚪ အဖြူ',8],['✨ ပုလဲ/ငွေရောင်',4]],n:'Super Cub — classic pearl blue'},
+   {code:'—',mm:'အပြာ Niltava ပုလဲ',en:'Pearl Niltava Blue (C125 2024)',hex:'#1a4a8a',f:[['🔵 အပြာ',85],['⚫ အမည်း',8],['✨ ပုလဲ/ငွေရောင်',7]],n:'Super Cub C125 2024 — pearl niltava blue'},
+   {code:'—',mm:'မီးခိုး ပုလဲ',en:'Pearl Gray (C125 2024)',hex:'#9a9da2',f:[['⚫ အမည်း',15],['⚪ အဖြူ',70],['✨ ပုလဲ/ငွေရောင်',15]],n:'Super Cub C125 2024 — pearl gray'},
+   {code:'—',mm:'အနီ',en:'Red (C125)',hex:'#a31212',f:[['🔴 အနီ',95],['⚫ အမည်း',5]],n:'Super Cub — red'},
+   {code:'—',mm:'ခရင်မ်',en:'Pearl Beige (C125)',hex:'#e8d8b8',f:[['⚪ အဖြူ',75],['🟡 အဝါ',20],['🔴 အနီ',3],['⚫ အမည်း',2]],n:'Super Cub — beige'},
+   {code:'NH-1',mm:'အမည်း',en:'Black (C125)',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'Super Cub — black'}]},
+ ],
+ yamaha:[
+  {name:'Exciter 150/155',mm:'အက်ဆိုက် တာ',colors:[
+   {code:'DPBMC',mm:'အပြာရင့်',en:'Deep Purplish Blue Metallic',hex:'#1e3a8a',f:[['🔴 အနီ',7],['🔵 အပြာ',88],['✨ ပုလဲ/ငွေရောင်',5]],n:'Team Yamaha blue'},
+   {code:'DNM5',mm:'မီးခိုးရင့် Matte',en:'Dark Gray Metallic',hex:'#4a4d52',f:[['⚫ အမည်း',32],['⚪ အဖြူ',68]],n:'Matte clear only'},
+   {code:'RBR',mm:'အနီရဲ',en:'Ruby Red',hex:'#9d1c1c',f:[['🔴 အနီ',90],['✨ ပုလဲ/ငွေရောင်',10]],n:''},
+   {code:'—',mm:'အစိမ်းရင့် Matte',en:'Dark Green Matte — Exciter 155 (VN)',hex:'#2b4d33',f:[['🔵 အပြာ',38],['🟡 အဝါ',39],['⚫ အမည်း',23]],n:'Exciter 155 VN — matte clear only, eye-match'},
+   {code:'—',mm:'အဖြူ/အနီ RC',en:'RC White-Red — Exciter (VN)',hex:'#e8e8e8',f:[['🔴 အနီ',15],['⚪ အဖြူ',85]],n:'Exciter RC edition — eye-match'},
+   {code:'—',mm:'အမည်း Matte',en:'Matte Black — Exciter 155 (VN)',hex:'#242424',f:[['⚫ အမည်း',100]],n:'Matte clear only — eye-match'}]},
+  {name:'Sirius FI',mm:'ဆီရီးယက်စ်',colors:[
+   {code:'1124',mm:'အဖြူ',en:'White',hex:'#f2f2f0',f:[['⚪ အဖြူ',100]],n:'Solid'},
+   {code:'DPBMU',mm:'အပြာနက်',en:'Midnight Blue',hex:'#16213e',f:[['🔵 အပြာ',70],['⚫ အမည်း',30]],n:''},
+   {code:'—',mm:'အနီ',en:'Red — Sirius (VN)',hex:'#b01a1a',f:[['🔴 အနီ',99],['⚫ အမည်း',1]],n:'Sirius VN — eye-match'},
+   {code:'—',mm:'အမည်း',en:'Black — Sirius (VN)',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'Sirius VN — solid'}]},
+  {name:'FZ-S 150',mm:'အက်ဖ်ဇက်',colors:[
+   {code:'DPBMC',mm:'အပြာ',en:'Yamaha Blue',hex:'#1e3a8a',f:[['🔴 အနီ',7],['🔵 အပြာ',88],['✨ ပုလဲ/ငွေရောင်',5]],n:''},
+   {code:'DNM7',mm:'မီးခိုး Matte',en:'Matte Gray',hex:'#55575c',f:[['⚫ အမည်း',31],['⚪ အဖြူ',69]],n:'Matte clear'},
+   {code:'—',mm:'အနီရဲ',en:'Red — FZ-S',hex:'#9d1c1c',f:[['🔴 အနီ',90],['✨ ပုလဲ/ငွေရောင်',10]],n:'FZ-S — eye-match'}]},
+  {name:'YBR125G',mm:'ဝိုင်ဘီအာ',colors:[
+   {code:'QS',mm:'ငွေရောင်',en:'Quartz Silver',hex:'#c0c4cc',f:[['⚪ အဖြူ',8],['✨ ပုလဲ/ငွေရောင်',92]],n:''},
+   {code:'—',mm:'အစိမ်းရင့်',en:'Dark Green — YBR',hex:'#2b4d33',f:[['🔵 အပြာ',38],['🟡 အဝါ',38],['⚫ အမည်း',24]],n:'YBR125G — eye-match'}]},
+ ],
+ suzuki:[
+  {name:'Gixxer S 150',mm:'ဂျစ်ဆာ',colors:[
+   {code:'YD8',mm:'ငွေရောင်',en:'Sonic Silver Metallic',hex:'#c0c4cc',f:[['⚪ အဖြူ',8],['✨ ပုလဲ/ငွေရောင်',92]],n:''},
+   {code:'YC2',mm:'အပြာ Candy',en:'Candy Grand Blue',hex:'#1445a0',f:[['🔵 အပြာ',96],['⚫ အမည်း',4]],n:'Candy — even coats'},
+   {code:'YAY',mm:'အနက်ပုလဲ',en:'Pearl Nebular Black',hex:'#20222a',f:[['⚫ အမည်း',86],['✨ ပုလဲ/ငွေရောင်',14]],n:''},
+   {code:'—',mm:'အနက် Matte',en:'Matte Black — Gixxer',hex:'#242424',f:[['⚫ အမည်း',100]],n:'Matte clear only — eye-match'}]},
+  {name:'Raider R150',mm:'ရိုင်ဒါ',colors:[
+   {code:'1LF',mm:'အပြာရင့် ပုလဲ',en:'Pearl Suzuki Deep Blue',hex:'#1a3a7a',f:[['🔵 အပြာ',80],['⚫ အမည်း',8],['✨ ပုလဲ/ငွေရောင်',12]],n:''},
+   {code:'YC6',mm:'အနီ Candy',en:'Candy Velvety Red',hex:'#8f1414',f:[['🔴 အနီ',89],['⚫ အမည်း',11]],n:'Candy red'},
+   {code:'—',mm:'အဖြူ/အနီ',en:'White-Red — Raider',hex:'#e8e8e8',f:[['🔴 အနီ',20],['⚪ အဖြူ',80]],n:'Raider — eye-match'}]},
+ ],
+ kawasaki:[
+  {name:'Ninja / Z series',mm:'နင်ဂျာ',colors:[
+   {code:'777',mm:'စိမ်းတောက်',en:'Lime Green',hex:'#66cc00',f:[['🔵 အပြာ',36],['🟡 အဝါ',64]],n:'Iconic Kawa green'},
+   {code:'BK2',mm:'အနက် Flat',en:'Flat Ebony',hex:'#1e1e1e',f:[['⚫ အမည်း',100]],n:'Flat clear only'}]},
+  {name:'KLX / D-Tracker 150',mm:'ကေအယ်လ်အိတ်စ်',colors:[
+   {code:'777',mm:'စိမ်းတောက်',en:'Lime Green',hex:'#66cc00',f:[['🔵 အပြာ',36],['🟡 အဝါ',64]],n:''},
+   {code:'40X',mm:'အဖြူပုလဲ',en:'Pearl Crystal White',hex:'#f5f5f2',f:[['⚪ အဖြူ',88],['✨ ပုလဲ/ငွေရောင်',12]],n:''}]},
+ ],
+ haojue:[
+  {name:'HJ125-8 / HJ125',mm:'HJ125',colors:[
+   {code:'F01',mm:'အနီ',en:'Red (Haojue)',hex:'#b01a1a',f:[['🔴 အနီ',99],['⚫ အမည်း',1]],n:'Haojue F01 — eye-match advised'},
+   {code:'F02',mm:'အမည်း',en:'Black (Haojue)',hex:'#1a1a1a',f:[['⚫ အမည်း',100]],n:'Haojue F02'},
+   {code:'—',mm:'အပြာ',en:'Blue (Haojue)',hex:'#1e4d8a',f:[['🔵 အပြာ',90],['⚪ အဖြူ',10]],n:'Haojue — eye-match'}]},
+  {name:'GN125',mm:'GN125',colors:[
+   {code:'F01',mm:'အနီ',en:'Red',hex:'#b01a1a',f:[['🔴 အနီ',99],['⚫ အမည်း',1]],n:''},
+   {code:'—',mm:'အပြာ',en:'Blue (name only)',hex:'#1e4d8a',f:[],n:'No code — eye-match or OEM panel'}]},
+  {name:'DR150S / DR300',mm:'DR',colors:[
+   {code:'—',mm:'အနီ',en:'Red (name only)',hex:'#a31414',f:[],n:'No code — eye-match'},
+   {code:'—',mm:'အမည်း',en:'Black (name only)',hex:'#1a1a1a',f:[],n:'No code — eye-match'}]},
+ ],
+ bajaj:[
+  {name:'Pulsar NS200 / N150',mm:'ပါလ်ဆာ',colors:[
+   {code:'—',mm:'အနီပြိုင်',en:'Racing Red (name only)',hex:'#a31414',f:[],n:'No public code — eye-match / OEM'},
+   {code:'—',mm:'အပြာ',en:'Caribbean Blue (name only)',hex:'#1a5a9a',f:[],n:'No public code'},
+   {code:'—',mm:'အဖြူ',en:'White (name only)',hex:'#f0f0ee',f:[],n:'No public code — eye-match'}]},
+  {name:'Boxer 100',mm:'ဘောက်ဆာ',colors:[
+   {code:'—',mm:'အမည်း',en:'Black (name only)',hex:'#1a1a1a',f:[],n:'Myanmar variant — eye-match'},
+   {code:'—',mm:'အနီ',en:'Red (name only)',hex:'#a31414',f:[],n:'Myanmar variant — eye-match'}]},
+  {name:'Discover / Platina',mm:'ဒစ်စကာဗာ',colors:[
+   {code:'—',mm:'အမည်း',en:'Ebony Black (name only)',hex:'#1a1a1a',f:[],n:'No public code'}]},
+ ],
+ tvs:[
+  {name:'Apache RTR 160/180/200',mm:'အပါချီ',colors:[
+   {code:'—',mm:'အနီပြိုင်',en:'Racing Red (name only)',hex:'#a31414',f:[],n:'No public code — eye-match / OEM'},
+   {code:'—',mm:'အမည်း',en:'Phantom Black (name only)',hex:'#1a1a1a',f:[],n:'No public code'},
+   {code:'—',mm:'အပြာပြိုင်',en:'Racing Blue (name only)',hex:'#1445a0',f:[],n:'No public code — eye-match'}]},
+ ],
+ hero:[
+  {name:'Splendor / HF Deluxe',mm:'စပလန်ဒါ',colors:[
+   {code:'—',mm:'အဝါ',en:'Iconic Yellow (name only)',hex:'#e6b800',f:[],n:'No public code — eye-match'},
+   {code:'—',mm:'အနီ',en:'Turbo Red (name only)',hex:'#b01a1a',f:[],n:'No public code'},
+   {code:'—',mm:'အမည်း',en:'Phantom Black (name only)',hex:'#1a1a1a',f:[],n:'No public code'}]},
+ ],
+ re:[
+  {name:'Classic 350 / Hunter 350',mm:'ကလက်ဆစ်',colors:[
+   {code:'—',mm:'အနက်မှိန်',en:'Stealth Black (name only)',hex:'#242424',f:[],n:'No public code — eye-match'},
+   {code:'—',mm:'မီးခိုးရင့်',en:'Gunmetal Grey (name only)',hex:'#5a5e63',f:[],n:'No public code'}]},
+ ],
+ vinfast:[
+  {name:'Evo / Feliz S',mm:'အီဗို',colors:[
+   {code:'—',mm:'အဖြူ',en:'White (name only)',hex:'#f0f0ee',f:[],n:'No codes published — eye-match'},
+   {code:'—',mm:'အစိမ်း',en:'Green (name only)',hex:'#2a7a4a',f:[],n:'No codes published — eye-match'}]},
+  {name:'Klara S2 / Vento',mm:'ကလာရာ',colors:[
+   {code:'—',mm:'အပြာ',en:'Blue (name only)',hex:'#1e4d8a',f:[],n:'No codes published — eye-match'},
+   {code:'—',mm:'အမည်း',en:'Black (name only)',hex:'#1a1a1a',f:[],n:'No codes published — eye-match'}]},
+ ],
+ china:[
+  {name:'Lifan (LF110/KP350)',mm:'လိုင်ဖန်',colors:[
+   {code:'—',mm:'အနီ',en:'Red (name only)',hex:'#a31414',f:[],n:'No code system — eye-match'},
+   {code:'—',mm:'အစိမ်း',en:'Green (name only)',hex:'#2a7a4a',f:[],n:'No code system — eye-match'},
+   {code:'—',mm:'အမည်း',en:'Black (name only)',hex:'#1a1a1a',f:[],n:'No code system — eye-match'}]},
+  {name:'Zongshen / Loncin / Dayun',mm:'ဇုန်ရှန်',colors:[
+   {code:'—',mm:'အရောင်အမည်',en:'Color name only',hex:'#888888',f:[],n:'No code — ask dealer / eye-match'}]},
+  {name:'Kenbo / Luojia / အခြား',mm:'ကန်ဘို',colors:[
+   {code:'—',mm:'အရောင်အမည်',en:'Color name only',hex:'#888888',f:[],n:'Border bikes — eye-match only'}]},
+ ],
+};
+
+/* ================= STATE ================= */
+let S={step:1,brand:null,model:null,chassis:'',wmi:null,color:null,adWatched:false};
+const $=id=>document.getElementById(id);
+
+/* ================= WIZARD ================= */
+function renderStepper(){
+  const steps=['Brand','Model','Chassis','Color','Code','Formula'];
+  $('stepper').innerHTML=steps.map((s,i)=>`<div class="step-dot${i<S.step?' done':''}"></div>`).join('');
+}
+function go(step){S.step=step;S.adWatched=false;render();}
+function render(){
+  renderStepper();
+  const w=$('wizard');
+  if(S.step===1) w.innerHTML=stepBrand();
+  else if(S.step===2) w.innerHTML=stepModel();
+  else if(S.step===3) w.innerHTML=stepChassis();
+  else if(S.step===4) w.innerHTML=stepColor();
+  else if(S.step===5) w.innerHTML=stepCode();
+  else if(S.step===6) w.innerHTML=stepFormula();
+  if(S.step===3) setTimeout(detectWMI,0);
+  window.scrollTo(0,0);
+}
+function backBtn(step){return `<button class="back-link" onclick="go(${step})">← နောက်သို့</button>`;}
+
+function stepBrand(){
+  return `<div class="step-title">🏭 Brand ရွေးပါ</div>
+  <div class="step-sub">ဘီးရဲ့ company ကို ရွေးပါ</div>
+  <div class="brand-grid">${BRANDS.map(b=>`<button class="brand-btn${S.brand===b.id?' sel':''}" onclick="pickBrand('${b.id}')">${b.name}<small>${b.mm} · ${b.note}</small></button>`).join('')}</div>`;
+}
+function pickBrand(id){S.brand=id;S.model=null;S.color=null;go(2);}
+
+function stepModel(){
+  const b=BRANDS.find(x=>x.id===S.brand);
+  const ms=MODELS[S.brand]||[];
+  return `${backBtn(1)}<div class="step-title">🏍️ Model ရွေးပါ</div>
+  <div class="step-sub">${b.name} (${b.mm}) — လူကြိုက်များတဲ့ model တွေ</div>
+  <div class="model-list">${ms.map((m,i)=>`<button class="model-btn${S.model===i?' sel':''}" onclick="pickModel(${i})">${m.name}<small>${m.mm} · အရောင် ${m.colors.length} မျိုး</small></button>`).join('')}</div>`;
+}
+function pickModel(i){S.model=i;S.color=null;go(3);}
+
+function stepChassis(){
+  return `${backBtn(2)}<div class="step-title">🔢 ချက်စီ နံပါတ်</div>
+  <div class="step-sub">ရှိရင် ရိုက်ထည့်ပါ — brand အတည်ပြုပေးမယ်။ <b>မရှိရင် ကျော်သွားလို့ရတယ်။</b></div>
+  <div class="field"><label>ချက်စီ / VIN နံပါတ် (ဇက်နား / ထိုင်ခုံအောက်)</label>
+  <input id="chIn" placeholder="ဥပမာ: RLHJA3933SY714225" value="${S.chassis}" maxlength="17" style="text-transform:uppercase" oninput="detectWMI()"></div>
+  <div class="wmi-hint" id="wmiHint"></div>
+  <button class="btn" onclick="chassisNext()">ရှေ့ဆက်မယ် →</button>
+  <button class="btn ghost" onclick="skipChassis()">ကျော်သွားမယ်</button>
+  <div class="tip">💡 VIN မှာ <b>အရောင် မပါဘူး</b> — model သိရုံနဲ့ အရောင် list ပြပေးမယ်။ ကိုယ်တိုင် ရွေးရမယ်။</div>`;
+}
+function detectWMI(){
+  const v=($('chIn').value||'').toUpperCase().trim();
+  const h=$('wmiHint');
+  if(v.length>=3){
+    const w=v.substring(0,3),m=WMI[w];
+    if(m){h.className='wmi-hint show';h.innerHTML=`✅ <b>${m[1]}</b> — ဒီ brand နဲ့ ကိုက်ညီတယ်!`;}
+    else{h.className='wmi-hint show';h.innerHTML=`⚠️ WMI <b>${w}</b> မသိဘူး — brand ကို ကိုယ်တိုင် ရွေးထားပြီးသား ဆက်သွားပါ။`;}
+  } else {h.className='wmi-hint';h.innerHTML='';}
+}
+function chassisNext(){S.chassis=($('chIn').value||'').toUpperCase().trim();go(4);}
+function skipChassis(){S.chassis='';go(4);}
+
+function stepColor(){
+  const m=MODELS[S.brand][S.model];
+  return `${backBtn(3)}<div class="step-title">🎨 Factory အရောင် ရွေးပါ</div>
+  <div class="step-sub">${m.name} — စက်ရုံ original အရောင်တွေ (နမူနာ)</div>
+  <div class="color-list">${m.colors.map((c,i)=>`<button class="color-btn${S.color===i?' sel':''}" onclick="pickColor(${i})"><div class="swatch" style="background:${c.hex}"></div><div class="color-info"><div class="cn">${c.mm}</div><div class="cc">${c.code!=='—'?c.code:''}</div><div class="ce">${c.en}</div></div></button>`).join('')}</div>`;
+}
+function pickColor(i){S.color=i;go(5);}
+
+function stepCode(){
+  const b=BRANDS.find(x=>x.id===S.brand);
+  const m=MODELS[S.brand][S.model];
+  const c=m.colors[S.color];
+  return `${backBtn(4)}<div class="step-title">📋 Color Code</div>
+  <div class="swatch xl-swatch" style="background:${c.hex}"></div>
+  <div class="code-card"><div class="lbl">Original Factory Code</div>
+  <div class="code">${c.code}</div>
+  <div class="cname">${c.mm} (${c.en})</div>
+  <div class="ce" style="margin-top:8px">🏭 ${b.name} · 🏍️ ${m.name}</div></div>
+  ${c.code!=='—'?'<div class="same-paint">🎨 Code တူ = <b>ဆေး တူ!</b></div>':''}
+  <div class="step-sub" style="text-align:center">ဆေးစပ်အချိုး ကြည့်ဖို့ ကြော်ငြာကြည့်ရမယ် 📺</div>
+  <button class="btn" onclick="showAd()">📺 ကြော်ငြာကြည့်ပြီး Formula ကြည့်မယ်</button>
+  ${c.code!=='—'?codeRefsWizardHTML(S.brand,S.model,c.code):''}`;
+}
+
+/* ---- shared rewarded-ad gate (v1 demo: 5s simulated ad) ---- */
+function adHTML(){
+  return `<div class="ad-box"><div class="ad-sim">
+    <div class="ad-tag">ADVERTISEMENT</div>
+    <div class="ad-title">🎨 PaintPro Supplies</div>
+    <div style="font-size:14px;color:var(--muted)">ဆေးနဲ့ ပစ္စည်း အကောင်းစားများ<br>Nippon · Toa · Asian Paints</div>
+    <div class="ad-timer" id="adTimer">5</div>
+    <div class="progress"><div id="adBar"></div></div>
+    <div style="font-size:12px;color:var(--muted)">(v1 demo — နောက် AdsGram အစစ် ထည့်မယ်)</div>
+  </div></div>`;
+}
+function runAdTimer(onDone){
+  let t=5;
+  const iv=setInterval(()=>{
+    t--;
+    if(t<=0){clearInterval(iv);onDone();}
+    else{const te=$('adTimer'),ba=$('adBar');if(te)te.textContent=t;if(ba)ba.style.width=((5-t)/5*100)+'%';}
+  },1000);
+}
+/* ---- AdsGram real rewarded ad, with demo fallback ---- */
+function showRealAd(onComplete){
+  try{
+    if(!window.Adsgram){runAdTimer(onComplete);return;}
+    const ctrl=window.Adsgram.init({blockId:ADSGRAM_BLOCK_ID});
+    ctrl.show().then(()=>{onComplete();}).catch(()=>{runAdTimer(onComplete);});
+  }catch(e){runAdTimer(onComplete);}
+}
+/* Unified rewarded-ad gate: real ad if Block ID set, else demo */
+function playRewardedAd(onComplete){
+  if(ADSGRAM_BLOCK_ID){showRealAd(onComplete);}
+  else{runAdTimer(onComplete);}
+}
+/* wizard ad gate */
+function showAd(){
+  $('wizard').innerHTML=`<div class="step-title">📺 ကြော်ငြာ</div>`+adHTML();
+  playRewardedAd(()=>{S.adWatched=true;go(6);});
+  window.scrollTo(0,0);
+}
+
+function stepFormula(){
+  const m=MODELS[S.brand][S.model];
+  const c=m.colors[S.color];
+  let body='';
+  if(c.f.length){
+    body=`<div class="formula-card"><h3>🧪 စပ်နည်း — ${c.mm}</h3>`+
+    c.f.map(x=>`<div class="comp"><span>${x[0]}</span><span class="pct">${x[1]}%</span></div>`).join('')+
+    (c.n?`<div class="tip">💡 ${c.n}</div>`:'')+`</div>
+    <div class="warn">⚠️ ဒါ <b>စမှတ် (starting point)</b> ပါ — test card မှာ စပ်ပြီး မျက်စိနဲ့ ညှိပါ။ ဆေးတံဆိပ် အလိုက် အနည်းငယ် ကွာနိုင်တယ်။</div>
+    <div class="formula-card"><h3>📐 Standard 2K Ratios</h3>
+    <div class="comp"><span>Base coat : Reducer</span><span class="pct">1 : 1</span></div>
+    <div class="comp"><span>2K solid : Hardener</span><span class="pct">2 : 1</span></div>
+    <div class="comp"><span>+ Thinner</span><span class="pct">10%</span></div>
+    <div class="comp"><span>Clear : Hardener : Reducer</span><span class="pct">4 : 1 : 1</span></div></div>`;
+  } else {
+    body=`<div class="warn">⚠️ <b>${c.code==='—'?'Code မရှိပါ':c.code}</b> — ဒီ brand အတွက် public formula မရှိဘူး။<br><br>နည်းလမ်း:<br>1️⃣ OEM panel ကို color name နဲ့ မှာပါ<br>2️⃣ မျက်စိနဲ့ စပ်ပါ — ရလဒ်ကို 📓 မှတ်တမ်းမှာ သိမ်းပါ</div>
+    <button class="btn" onclick="nbFromFormula()">📓 ဒီအရောင်ကို မှတ်တမ်းမှာ သိမ်းမယ်</button>`;
+  }
+  return `${backBtn(5)}<div class="step-title">✅ Formula ရပြီ!</div>
+  <div class="step-sub">${m.name} · ${c.mm} (${c.en}) · Code: <b style="color:var(--accent)">${c.code}</b></div>
+  ${body}
+  ${c.code!=='—'?codeRefsWizardHTML(S.brand,S.model,c.code):''}
+  <button class="btn ghost" onclick="go(1)">🔄 အသစ် ရှာမယ်</button>`;
+}
+function nbFromFormula(){
+  const m=MODELS[S.brand][S.model];
+  const c=m.colors[S.color];
+  openNbForm(null,{title:c.mm+' — '+m.name,bike:m.name+' ('+c.code+')',colorDesc:c.en});
+}
+
+/* ================= CODE CROSS-REFERENCE ================= */
+let CODE_IDX=null;
+function normCode(s){return String(s||'').toUpperCase().replace(/[\s\-_]/g,'');}
+function buildCodeIdx(){
+  CODE_IDX=[];
+  for(const b of BRANDS){
+    const ms=MODELS[b.id]||[];
+    ms.forEach((m,mi)=>{
+      m.colors.forEach((c,ci)=>{
+        if(c.code&&c.code!=='—')CODE_IDX.push({key:b.id+'|'+mi+'|'+ci,bid:b.id,bname:b.name,bmm:b.mm,mi:mi,mname:m.name,mmm:m.mm,ci:ci,c:c});
+      });
+    });
+  }
+}
+function codeSearch(q){
+  if(!CODE_IDX)buildCodeIdx();
+  const nq=normCode(q);
+  if(nq.length<2)return[];
+  return CODE_IDX.filter(e=>normCode(e.c.code).includes(nq));
+}
+function pickCodeResult(bid,mi,ci){S.brand=bid;S.model=mi;S.color=ci;S.chassis='';go(5);}
+function codeRefsWizardHTML(bid,mi,code){
+  const list=codeSearch(code).filter(e=>!(e.bid===bid&&e.mi===mi));
+  if(!list.length)return '';
+  return `<div class="step-title" style="margin-top:16px">🔗 ဒီ ဆေး ကို သုံး တဲ့ ဘီးတွေ (${list.length})</div>
+  <div class="same-paint">🎨 Code တူ = <b>ဆေး တူ!</b> — ဒီ ဆေးတံဆိပ် code နဲ့ အတူတူ ဆေးပဲ!</div>
+  <div>${list.map(e=>`<button class="code-res" onclick="pickCodeResult('${e.bid}',${e.mi},${e.ci})"><div class="swatch sm" style="background:${e.c.hex}"></div><div style="flex:1">🏭 ${e.bname} · 🏍️ ${e.mname}<br><small style="color:var(--muted)">${e.c.mm} (${e.c.en})</small></div><span style="font-size:20px">→</span></button>`).join('')}</div>`;
+}
+function codeRefsRecipesHTML(code,curKey){
+  const list=codeSearch(code).filter(e=>e.key!==curKey&&recipeByKey(e.key));
+  if(!list.length)return '';
+  return `<div class="step-title" style="margin-top:16px">🔗 ဒီ ဆေး ကို သုံး တဲ့ ဘီးတွေ (${list.length})</div>
+  <div class="same-paint">🎨 Code တူ = <b>ဆေး တူ!</b> — ဒီ ဆေးတံဆိပ် code နဲ့ အတူတူ ဆေးပဲ!</div>
+  <div>${list.map(e=>`<button class="code-res" onclick="openRecipe('${e.key}')"><div class="swatch sm" style="background:${e.c.hex}"></div><div style="flex:1">🏭 ${e.bname} · 🏍️ ${e.mname}<br><small style="color:var(--muted)">${e.c.mm} (${e.c.en})</small></div><span style="font-size:20px">→</span></button>`).join('')}</div>`;
+}
+
+/* ================= RECIPES (အရောင်စပ်နည်း) ================= */
+let R={brand:'all',q:'',cur:null,unlocked:{},cans:null}; /* unlocked: recipe key -> true (this session); cans: selected base cans for filter */
+const CANS=[
+  {id:'red',e:'🔴',n:'အနီ',opt:false},
+  {id:'blue',e:'🔵',n:'အပြာ',opt:false},
+  {id:'yellow',e:'🟡',n:'အဝါ',opt:false},
+  {id:'black',e:'⚫',n:'အမည်း',opt:false},
+  {id:'white',e:'⚪',n:'အဖြူ',opt:false},
+  {id:'pearl',e:'✨',n:'ပုလဲ/ငွေရောင်',opt:true},
+];
+function cansNeeded(c){
+  const s=new Set();
+  for(const x of (c.f||[])){
+    const n=x[0];
+    if(n.includes('🔴'))s.add('red');
+    else if(n.includes('🔵'))s.add('blue');
+    else if(n.includes('🟡'))s.add('yellow');
+    else if(n.includes('⚫'))s.add('black');
+    else if(n.includes('⚪'))s.add('white');
+    else if(n.includes('✨'))s.add('pearl');
+  }
+  return s;
+}
+function fiveCanHTML(){
+  const sel=R.cans||[];
+  const cansBtns=CANS.map(c=>
+    `<button class="can${c.opt?' opt':''}${sel.includes(c.id)?' sel':''}" onclick="toggleCan('${c.id}')">
+      <span class="ce">${c.e}</span><span class="cn">${c.n}${c.opt?'<br>(အပို)':''}</span>
+    </button>`).join('');
+  return `<div class="fivecan">
+    <h2>🥫 ၅ ဘူး စနစ်</h2>
+    <div class="tag">ဆေး <b style="color:var(--accent)">၅ ဘူး</b> ဝယ်ထား → ကြိုက်တဲ့ အရောင် <b style="color:var(--accent)">စပ်လို့ရ!</b><br>
+    အောက်က အရောင် <b>အားလုံး</b> ဒီ ၅ ဘူး (+ပုလဲ) နဲ့ပဲ စပ်ထားတာ။</div>
+    <div class="cans">${cansBtns}</div>
+    <div class="theory">
+      <b>🎓 အခြေခံ စပ်နည်း:</b><br>
+      🟡 အဝါ + 🔵 အပြာ = <b>🟢 အစိမ်း</b><br>
+      🔴 အနီ + 🟡 အဝါ = <b>🟠 လိမ္မော်</b><br>
+      🔴 အနီ + 🔵 အပြာ = <b>🟣 ခရမ်း</b><br>
+      🔴 အနီ + 🟡 အဝါ + ⚫ အမည်း = <b>🟤 အညို</b><br>
+      🔴 အနီ + ⚪ အဖြူ = <b>🌸 ပန်းရောင်</b><br>
+      ⚫ အမည်း + ⚪ အဖြူ = <b>⬜ မီးခိုး</b><br>
+      ✨ ပုလဲ ထည့် = <b>တောက်�ပ/metallic</b>
+    </div>
+    <div class="step-sub" style="margin:8px 0 0">👆 အပေါ်က ကိုယ့်မှာ <b>ရှိတဲ့ ဘူး</b>တွေ နှိပ် ရွေး — စပ်လို့ရတဲ့ အရောင်ပဲ ပြမယ်</div>
+  </div>`;
+}
+function toggleCan(id){
+  if(!R.cans)R.cans=[];
+  const i=R.cans.indexOf(id);
+  if(i>=0)R.cans.splice(i,1);else R.cans.push(id);
+  renderRecipes();
+}
+function canFilterOK(r){
+  if(!R.cans||!R.cans.length)return true;
+  const need=cansNeeded(r.c);
+  for(const n of need){if(!R.cans.includes(n))return false;}
+  return true;
+}
+function allRecipes(){
+  const out=[];
+  for(const b of BRANDS){
+    const ms=MODELS[b.id]||[];
+    ms.forEach((m,mi)=>{
+      m.colors.forEach((c,ci)=>{
+        if(c.f&&c.f.length) out.push({key:b.id+'|'+mi+'|'+ci,bid:b.id,brand:b.name,brandMm:b.mm,model:m.name,modelMm:m.mm,c:c});
+      });
+    });
+  }
+  return out;
+}
+function recipeByKey(key){return allRecipes().find(r=>r.key===key);}
+
+function renderRecipes(){
+  R.cur=null;
+  const all=allRecipes();
+  const q=R.q.trim().toLowerCase();
+  const list=all.filter(r=>
+    (R.brand==='all'||r.bid===R.brand) &&
+    (!q||r.c.mm.toLowerCase().includes(q)||r.c.en.toLowerCase().includes(q)||r.model.toLowerCase().includes(q)||r.brand.toLowerCase().includes(q)) &&
+    canFilterOK(r)
+  );
+  $('recipesBody').innerHTML=
+  fiveCanHTML()+
+  `<div class="step-title">🎨 အရောင်စပ်နည်း</div>
+   <div class="step-sub">Formula ရှိတဲ့ အရောင် <b style="color:var(--accent)">${all.length}</b> မျိုး — အရောင်ရွေးပြီး ကြော်ငြာကြည့်မှ အချိုးပေါ်မယ်${R.cans&&R.cans.length?` · 🧮 စပ်လို့ရတာ <b style="color:var(--green)">${list.length}</b> မျိုး`:''}</div>
+   <div class="search-field">🔍<input id="rcQ" placeholder="အရောင် / model ရှာမယ်…" value="${esc(R.q)}" oninput="R.q=this.value;rcSearch()"></div>
+   <div class="chip-row">
+     <button class="chip${R.brand==='all'?' sel':''}" onclick="rcBrand('all')">အားလုံး</button>
+     ${BRANDS.map(b=>`<button class="chip${R.brand===b.id?' sel':''}" onclick="rcBrand('${b.id}')">${b.mm}</button>`).join('')}
+   </div>
+   <div class="color-list" id="rcList">${rcListHTML(list)}</div>
+   ${list.length?'':`<div class="empty">🔍<br>မတွေ့ဘူး — တခြား စာလုံး ရိုက်ကြည့်ပါ</div>`}`;
+}
+function rcListHTML(list){
+  return list.map(r=>{
+    const open=R.unlocked[r.key];
+    return `<button class="color-btn" onclick="openRecipe('${r.key}')">
+      <div class="swatch" style="background:${r.c.hex}"></div>
+      <div class="color-info"><div class="cn">${r.c.mm}</div>
+      <div class="cc">${r.c.code!=='—'?r.c.code:''}</div>
+      <div class="ce">${r.c.en} · ${r.brand} ${r.model}</div></div>
+      <div style="font-size:22px">${open?'✅':'🔒'}</div>
+    </button>`;
+  }).join('');
+}
+function rcSearch(){
+  const all=allRecipes();
+  const q=R.q.trim().toLowerCase();
+  const list=all.filter(r=>
+    (R.brand==='all'||r.bid===R.brand) &&
+    (!q||r.c.mm.toLowerCase().includes(q)||r.c.en.toLowerCase().includes(q)||r.model.toLowerCase().includes(q)||r.brand.toLowerCase().includes(q)) &&
+    canFilterOK(r)
+  );
+  $('rcList').innerHTML=rcListHTML(list);
+}
+function rcBrand(id){R.brand=id;renderRecipes();}
+
+function openRecipe(key){
+  const r=recipeByKey(key);
+  if(!r){renderRecipes();return;}
+  R.cur=key;
+  const c=r.c, open=R.unlocked[key];
+  let formulaPart;
+  if(open){
+    formulaPart=`<div class="formula-card"><h3>🧪 စပ်နည်း — ${c.mm}</h3>`+
+      c.f.map(x=>`<div class="fcomp"><div class="frow"><span>${x[0]}</span><span class="pct">${x[1]}%</span></div><div class="pbar"><div style="width:${x[1]}%"></div></div></div>`).join('')+
+      (c.n?`<div class="tip">💡 ${c.n}</div>`:'')+`</div>
+      <div class="warn">⚠️ ဒါ <b>စမှတ် (starting point)</b> ပါ — test card မှာ စပ်ပြီး မျက်စိနဲ့ ညှိပါ။ ဆေးတံဆိပ် အလိုက် အနည်းငယ် ကွာနိုင်တယ်။</div>
+      <div class="formula-card"><h3>📐 Standard 2K Ratios</h3>
+      <div class="comp"><span>Base coat : Reducer</span><span class="pct">1 : 1</span></div>
+      <div class="comp"><span>2K solid : Hardener</span><span class="pct">2 : 1</span></div>
+      <div class="comp"><span>+ Thinner</span><span class="pct">10%</span></div>
+      <div class="comp"><span>Clear : Hardener : Reducer</span><span class="pct">4 : 1 : 1</span></div></div>`;
+  }else{
+    formulaPart=`<div class="formula-card"><div class="lock-wrap">
+      <div class="lk">🔒</div>
+      <p>အချိုးအစား အတိအကျ ကြည့်ဖို့<br><b>ကြော်ငြာ ကြည့်ရမယ်</b> 📺</p>
+      <button class="btn" onclick="watchRecipeAd('${key}')">📺 ad ကြည့်ရန် နှိပ်ပါ</button>
+    </div></div>`;
+  }
+  $('recipesBody').innerHTML=
+  `<button class="back-link" onclick="renderRecipes()">← စပ်နည်း list</button>
+   <div class="step-title">${c.mm}</div>
+   <div class="step-sub">${c.en}</div>
+   <div class="swatch xl-swatch" style="background:${c.hex}"></div>
+   ${c.code!=='—'?`<div class="code-card"><div class="lbl">Original Factory Code</div><div class="code">${c.code}</div></div>
+   <div class="same-paint">🎨 Code တူ = <b>ဆေး တူ!</b></div>`:`<div class="step-sub" style="text-align:center">📋 Code မရှိ — eye-match နဲ့ စပ်ပါ</div>`}
+   <div class="recipe-meta">
+     <span>🏭 ${r.brand}</span><span>🏍️ ${r.model}</span>
+   </div>
+   <div id="rcFormula">${formulaPart}</div>
+   ${c.code!=='—'?codeRefsRecipesHTML(c.code,R.cur):''}
+   <button class="btn ghost" onclick="renderRecipes()">← တခြား အရောင်</button>`;
+  window.scrollTo(0,0);
+}
+function watchRecipeAd(key){
+  $('rcFormula').innerHTML=`<div class="step-title" style="margin-top:8px">📺 ကြော်ငြာ</div>`+adHTML();
+  window.scrollTo(0,0);
+  playRewardedAd(()=>{R.unlocked[key]=true;openRecipe(key);});
+}
+
+/* ================= PAINT SCHOOL ================= */
+const CANS5=[['r','🔴','အနီ'],['b','🔵','အပြာ'],['y','🟡','အဝါ'],['k','⚫','အမည်း'],['w','⚪','အဖြူ']];
+const MIXR={
+ 'b+b':['အပြာ','Blue','#1e5ad4'],'b+k':['နက်ဗီ (အပြာရင့်)','Navy','#1e2a6e'],
+ 'b+r':['ခရမ်း','Purple','#7a2ad4'],'b+w':['မိုးပြာ (အပြာနု)','Sky Blue','#8ab8e8'],
+ 'b+y':['အစိမ်း','Green','#2a9e4a'],'k+k':['အမည်း','Black','#1a1a1a'],
+ 'k+r':['မာရွန် (အနီရင့်)','Maroon','#7a1e1e'],'k+w':['မီးခိုး','Gray','#8a8a8a'],
+ 'k+y':['သံလွင်ညို','Olive','#7a7a2a'],'r+r':['အနီ','Red','#d42a1e'],
+ 'r+w':['ပန်းရောင်','Pink','#e88aa0'],'r+y':['လိမ္မော်','Orange','#e8761e'],
+ 'w+w':['အဖြူ','White','#f5f5f5'],'w+y':['ခရင်မ်','Cream','#f5e6a8'],
+ 'y+y':['အဝါ','Yellow','#f5c518']};
+let SM={a:'r',b:'b'},SQ=null;
+const SCHOOL=[
+{icon:'🌱',mm:'Level 1 — အခြေခံ',en:'Primary Colors',
+ intro:'ဆရာ က ကြို ဆို တယ်! 🎉 ဒီ Level မှာ အရောင် ရဲ့ အခြေခံ အကျဆုံး ကို လေ့လာ မယ်။ ဒါ သိ ရင် ဆေး ၅ ဘူး နဲ့ အရောင် ရာချီ စပ် လို့ ရ ပြီ!',
+ lessons:[
+  {t:'🎨 Primary အရောင် ၃ မျိုး',d:[
+   'Primary အရောင် ဆို တာ တခြား ဘယ် အရောင် နဲ့ မှ ဖော် စပ် လို့ မ ရ တဲ့ <b>အခြေခံ အရောင်</b> တွေ ပါ — 🔴 အနီ, 🔵 အပြာ, 🟡 အဝါ။',
+   'ဒီ ၃ ရောင် က နေ ကမ္ဘာ ပေါ် က အရောင် တော် တော် များ များ ကို စပ် လို့ ရ တယ်။ ဒါ ကြောင့် ဆေး ဆရာ တိုင်း ဒီ ၃ ဘူး ကို အရင် ဝယ် ရ တယ်။'],
+   tip:'မှတ် ထား: Primary = မွေး စား အရောင်။ သူ့ ကို ခွဲ လို့ မ ရ ဘူး!'},
+  {type:'mixer',t:'🧪 စမ်းသပ်ခန်း — ၂ ရောင် ရော ကြည့်!'},
+  {t:'🌈 Secondary အရောင် ၃ မျိုး',d:[
+   'Primary ၂ ရောင် ရော လိုက် ရင် <b>Secondary</b> ရောင် ရ တယ်:',
+   '🟡 အဝါ + 🔵 အပြာ = <b>🟢 အစိမ်း</b><br>🔴 အနီ + 🟡 အဝါ = <b>🟠 လိမ္မော်</b><br>🔴 အနီ + 🔵 အပြာ = <b>🟣 ခရမ်း</b>',
+   'ဘဲခေါင်းစိမ်း လို နာမည်ကြီး အရောင် တွေ တောင် ဒီ နည်း နဲ့ ပဲ စ တယ် — အစိမ်း = အဝါ + အပြာ!'],
+   tip:'အထက် က စမ်းသပ်ခန်း မှာ ကိုယ် တိုင် ရော ကြည့် ပြီးပြီ လား?'},
+  {t:'⚫⚪ အမည်း နဲ့ အဖြူ ရဲ့ အလုပ်',d:[
+   '⚫ <b>အမည်း</b> = အရောင် ကို <b>ရင့် စေ / မှောင် စေ</b> တယ် (shade)။ ဥပမာ: အနီ + အမည်း နည်း နည်း = မာရွန်။',
+   '⚪ <b>အဖြူ</b> = အရောင် ကို <b>ဖျော့ စေ / လင်း စေ</b> တယ် (tint)။ ဥပမာ: အနီ + အဖြူ = ပန်းရောင်။',
+   '⚫ + ⚪ = <b>မီးခိုး</b>။ မီးခိုး က အရောင် တိုင်း ကို "ငြိမ်" စေ တယ် — တောက် ပ မှု လျှော့ ချင် ရင် သုံး။'],
+   warn:'သတိ: အမည်း က အရမ်း ပြင်း တယ်! နည်း နည်း ချင်း ပဲ ထည့် — များ သွား ရင် ပြန် ဖျော့ လို့ မ လွယ် ဘူး။'}
+ ],
+ quiz:[
+  {q:'Primary အရောင် ၃ မျိုး က ဘာ တွေ လဲ?',a:['🔴 အနီ · 🔵 အပြာ · 🟡 အဝါ','🔴 အနီ · 🟢 အစိမ်း · 🔵 အပြာ','⚫ အမည်း · ⚪ အဖြူ · 🟡 အဝါ'],c:0},
+  {q:'အစိမ်း ရ အောင် ဘာ ၂ ရောင် ရော မလဲ?',a:['🔴 အနီ + 🔵 အပြာ','🟡 အဝါ + 🔵 အပြာ','🔴 အနီ + 🟡 အဝါ'],c:1},
+  {q:'အရောင် ကို ဖျော့ စေ ချင် ရင် ဘာ ထည့် မလဲ?',a:['⚫ အမည်း','⚪ အဖြူ','🔴 အနီ'],c:1}
+ ]},
+{icon:'🧪',mm:'Level 2 — အရောင်စပ်နည်း',en:'Mixing Colors',
+ intro:'Level 1 မှာ အခြေခံ သိ ပြီ! ခု တကယ် စပ် တတ် အောင် သင် မယ် — ရင့်/ဖျော့ ညှိ နည်း, ပူ/အေး အရောင်, နဲ့ ၅ ဘူး စနစ်!',
+ lessons:[
+  {t:'🌗 ရင့်စေ / ဖျော့စေ နည်း',d:[
+   'လက် ရှိ အရောင် တစ် ခု ကို <b>ရင့် စေ</b> ချင် ရင် ⚫ အမည်း ကို <b>နည်း နည်း ချင်း</b> ထည့်။ ဥပမာ — အနီ တောက် ကို မာရွန် ဖြစ် စေ ချင် ရင် အမည်း ၁၀-၁၅%။',
+   '<b>ဖျော့ စေ</b> ချင် ရင် ⚪ အဖြူ ထည့်။ အနီ + အဖြူ ၃၀% = ပန်းရောင် နု။',
+   'စည်း မျဉ်း: <b>အမည်း ကို လက် ဖက် ရည် ဇွန်း တစ် ဇွန်း စာ</b> လောက် က နေ စ ထည့် — များ သွား ရင် ပြန် ပြင် လို့ ခက် တယ်!'],
+   warn:'အမည်း များ သွား ရင် အရောင် "သေ" သွား တယ် (muddy)။ အမြဲ နည်း နည်း ချင်း!'},
+  {t:'🔥 ပူတဲ့ အရောင် vs ❄️ အေးတဲ့ အရောင်',d:[
+   '<b>ပူ တဲ့ အရောင် (Warm):</b> 🔴 အနီ, 🟠 လိမ္မော်, 🟡 အဝါ — အား ကောင်း, စိတ် လှုပ် ရှား စေ, ဘီး ကို "မြန်" လို့ ထင် စေ တယ်။',
+   '<b>အေး တဲ့ အရောင် (Cool):</b> 🔵 အပြာ, 🟢 အစိမ်း, 🟣 ခရမ်း — တည် ငြိမ်, သန့် ရှင်း, "ဈေး ကြီး" လို့ ထင် စေ တယ်။',
+   'Customer က "တောက် ပ ချင်" ရင် warm, "ခံ့ ညား ချင်" ရင် cool ကို အကြံ ပေး — ဒါ ဆရာ ရဲ့ လျှို့ဝှက်ချက်! 😉'],
+   tip:'Warm + Cool ရော ရင် အရောင် "ငြိမ်" သွား တယ် — ရည်ရွယ်ချက် ရှိ မှ ရော!'},
+  {t:'🧪 ခက်တဲ့ အရောင်တွေ စပ်နည်း',d:[
+   '<b>အညို</b> = 🔴 + 🟡 + ⚫ နည်း နည်း (အနီ များ ရင် နီညို, အဝါ များ ရင် ဝါညို)<br><b>မီးခိုး</b> = ⚫ + ⚪ (အမည်း များ ရင် ရင့်မီးခိုး)<br><b>ပန်းရောင်</b> = 🔴 + ⚪<br><b>Navy</b> = 🔵 + ⚫<br><b>Teal</b> = 🔵 + 🟡 + ⚫ နည်း နည်း',
+   'ဒီ formula တွေ အကုန် ဒီ app ရဲ့ 🎨 စပ်နည်း tab မှာ အချိုး အတိ အကျ နဲ့ ရှိ တယ် — ကြော်ငြာ ကြည့် ပြီး ယူ!'],
+   tip:'Formula က စမှတ် ပဲ — test card မှာ စပ် ပြီး မျက်စိ နဲ့ အမြဲ ညှိ!'},
+  {t:'🥫 ၅ ဘူး စနစ်',d:[
+   'ဆေး ဆရာ Pro တိုင်း ရဲ့ လျှို့ဝှက်ချက်: <b>ဘူး ၅ ဘူး ပဲ</b> ဝယ် ထား — 🔴🔵🟡⚫⚪ (+ ✨ ပုလဲ တစ် ဘူး)။',
+   'ဒီ ၅ ဘူး နဲ့ ဆိုင်ကယ် အရောင် <b>၁၀၀ ကျော်</b> စပ် လို့ ရ တယ်! ဒီ app ရဲ့ formula တိုင်း ဒီ ၅ ဘူး က နေ ပဲ ရေး ထား တာ။',
+   'စတင် တဲ့ သူ အတွက် ရင်းနှီး မြှုပ်နှံမှု နည်း — ဘူး ၅ ဘူး ဖိုး ပဲ ကုန် တယ်, အရောင် အား လုံး ရ တယ်!'],
+   tip:'🎨 စပ်နည်း tab ထိပ် မှာ "🧮 ဘာ စပ် လို့ ရ လဲ" calculator ရှိ တယ် — ရှိ တဲ့ ဘူး ရွေး ကြည့်!'}
+ ],
+ quiz:[
+  {q:'အညို ရ အောင် ဘာ တွေ ရော မလဲ?',a:['🔴 + 🟡 + ⚫ နည်း နည်း','🔵 + ⚪','🔴 + 🔵'],c:0},
+  {q:'Warm color က ဘာ လဲ?',a:['🔵 အပြာ','🔴 အနီ','🟢 အစိမ်း'],c:1},
+  {q:'အမည်း ထည့် တော့ ဘယ် လို ထည့် ရ မလဲ?',a:['နည်း နည်း ချင်း','တစ် ဝက် ချင်း','အကုန် လောင်း'],c:0}
+ ]},
+{icon:'🎨',mm:'Level 3 — ဆေးအမျိုးအစား',en:'Paint Types',
+ intro:'တူ တူ အနီ ချင်း တောင် solid / metallic / pearl / candy ဆို ဈေး ရော အလှ ရော ကွာ တယ်! ဒီ Level မှာ ဆေး အမျိုး အစား ခွဲ တတ် မယ်။',
+ lessons:[
+  {t:'✨ Solid vs Metallic vs Pearl',d:[
+   '<b>Solid (ရိုးရိုး):</b> အရောင် သန့် သန့် တစ် ထပ် တည်း။ ဈေး သက် သာ, ပြင် ရ လွယ်။ ဥပမာ: NH-1 အမည်း, Shasta White။',
+   '<b>Metallic:</b> အထဲ မှာ သတ္တု မှုန့် ပါ — နေ ရောင် ထိ ရင် တောက် ပ! ဥပမာ: Silver Metallic, Petrol Blue Metallic။',
+   '<b>Pearl (ပုလဲ):</b> အလင်း ပြန် မှု က ကြည့် တဲ့ ထောင့် ပေါ် မူ တည် ပြီး ပြောင်း — အရောင် နည်း နည်း ရွေ့ သလို မြင် ရ။ ဥပမာ: Crystal Black Pearl, ပုလဲဖြူ။'],
+   tip:'Metallic/Pearl မှုတ် တော့ gun ကို ညီညီ ရွေ့ — ရပ် လိုက် ရင် အကွက် (mottle) ထင် တယ်!'},
+  {t:'🍒 Candy — နက်ရှိုင်းမှု ရဲ့ လျှို့ဝှက်ချက်',d:[
+   'Candy ဆေး က <b>၃ ဆင့်</b>: (1) ငွေရောင် metallic base → (2) အနီ လို transparent အရောင် ၂-၃ ထပ် → (3) Clear။',
+   'ရလဒ်: ရေ ကန် လို <b>နက် ရှိုင်း</b> တဲ့ အရောင် — အထဲ ကို မြင် ရ သလို ခံစား ရ တယ်! Scoopy အနီရဲ Candy လို။',
+   'ဈေး ကြီး တဲ့ အ ကြောင်း: ဆေး ၃ မျိုး + အချိန် ၃ ဆ + လက် ရာ ကျွမ်း ကျင် မှု လို!'],
+   warn:'Candy မှာ တစ် ထပ် ထူ/ပါး မညီ ရင် အရောင် ကွက် ကျား ဖြစ် — အစ ပြု သူ မ စမ်း သင့်!'},
+  {t:'⬛ Matte — သတိထား!',d:[
+   'Matte (ခြောက်) ဆေး က တောက် ပ မှု <b>မ ရှိ</b> — ခဲနက်, အနက်ခြောက် လို ခေတ် စား အရောင် တွေ။',
+   'စည်း မျဉ်း ကြီး: <b>Matte clear ပဲ သုံး — Gloss clear လုံး ဝ မ ရ!</b> Gloss ထည့် မိ ရင် matte ပျက် စီး ပြီ။',
+   'Matte က ဖုန်/လက် ရာ ထင် လွယ် — မှုတ် ပြီးရင် polish လုံး ဝ မ လုပ် ရ!'],
+   warn:'Matte ဆေး ကို ပြင် ချင် ရင် ပြန် မှုတ် ရုံ ပဲ ရှိ — polish/compound ထိ လို့ မ ရ!'},
+  {t:'🥞 1-Stage / 2-Stage / 3-Stage',d:[
+   '<b>1-Stage:</b> ဆေး တစ် မျိုး တည်း (ဥပမာ solid အမည်း) — မှုတ် → ပြီးပြီ။',
+   '<b>2-Stage:</b> Base coat (အရောင်) + Clear coat (အကာ)။ ယနေ့ ခေတ် စံ — တောက် ပ မှု က clear က နေ လာ။',
+   '<b>3-Stage (Tricoat):</b> Base + <b>Mid-coat</b> (pearl/candy) + Clear။ ပုလဲဖြူ, Candy အနီ လို အရောင် တွေ — mid-coat က အသက်!'],
+   tip:'Mid-coat ပါး ရင် အရောင် ဖျော့, ထူ ရင် ရင့်/ကွက် — ၁-၂ ထပ် ပါး ပါး!'}
+ ],
+ quiz:[
+  {q:'Candy red က အဆင့် ဘယ် နှစ် ဆင့် လဲ?',a:['၂ ဆင့်','၃ ဆင့်','၁ ဆင့်'],c:1},
+  {q:'Matte ဆေး မှာ ဘာ clear သုံး ရ မလဲ?',a:['Matte clear','Gloss clear','Clear မ လို'],c:0},
+  {q:'Pearl effect က ဘယ် coat မှာ ထည့် လဲ?',a:['Base coat','Mid-coat','Primer'],c:1}
+ ]},
+{icon:'🔧',mm:'Level 4 — လက်တွေ့နည်းစနစ်',en:'Practical Techniques',
+ intro:'စာတွေ့ ပြီးပြီ — ခု လက် တွေ့! ဒီ Level က ဆိုင် မှာ တန်း သုံး လို့ ရ တဲ့ နည်း စနစ် တွေ!',
+ lessons:[
+  {t:'⚖️ အချိုး တိုင်း နည်း',d:[
+   'အကောင်းဆုံး: <b>ဒစ်ဂျစ်တယ် ချိန် (gram)</b> — 0.1g ထိ တိ ကျ။ ဆေး ဗူး ပေါ် မှာ ချိန် ခွက် တင် → zero → ဆေး လောင်း။',
+   'Volume (ml) နဲ့ လည်း ရ — ဒါပေမဲ့ ဆေး အပျစ် အလိုက် အ လေး ချိန် ကွာ နိုင် လို့ gram ပို တိ ကျ။',
+   'Formula မှတ် တော့ <b>% နဲ့ မှတ်</b> — ဘယ် ပမာဏ စပ် စပ် အချိုး တူ ရင် အရောင် တူ တယ်!'],
+   tip:'စပ် ပြီးသား formula ကို 📓 မှတ်တမ်း tab မှာ သိမ်း — နောက် တစ် ခေါက် အလွယ်!'},
+  {t:'🃏 Test Panel — အမြဲ အရင် စမ်း!',d:[
+   'စည်း မျဉ်း: <b>ဘီး ပေါ် မ မှုတ် ခင် test card မှာ အရင် မှုတ်!</b> သတ္တု ပြား အဟောင်း / ကတ် ထူ ပေါ် စမ်း။',
+   'Test card ကို base → mid → clear အပြည့် မှုတ် ပြီး <b>နေ ရောင် အောက်</b> မှာ မူရင်း နဲ့ ယှဉ် ကြည့်။',
+   'မ တူ ရင် formula ပြင် → ထပ် စမ်း → တူ ပြီ ဆို မှ ဘီး ပေါ် မှုတ်။ ဒါ Pro တိုင်း လုပ် တဲ့ အဆင့်!'],
+   warn:'Test မ လုပ် ပဲ တန်း မှုတ် မိ ရင် ပြန် ပြင် ရ တာ ၃ ဆ ကုန် — အချိန် + ဆေး + စိတ်ဓာတ်!'},
+  {t:'🔫 Gun မှုတ် နည်း',d:[
+   '<b>အကွာအဝေး:</b> 15-20 cm။ နီး လွန်း → ဆေး ယို (runs), ဝေး လွန်း → ခြောက် ကြမ်း (dry spray)။',
+   '<b>Overlap 50%:</b> တစ် ကြောင်း မှုတ် ပြီးရင် ဒုတိယ ကြောင်း က ပထမ ရဲ့ တစ် ဝက် ပေါ် ထပ် — ဒါ မှ ညီ!',
+   '<b>ပါး ပါး အထပ် များ များ:</b> တစ် ထပ် တည်း ထူ ထူ မ မှုတ် နဲ့ — ၂-၃ ထပ် ပါး ပါး က ပို လှ ပို ခံ!'],
+   tip:'လက် ကို ခါး က နေ ရွေ့ — လက် ကောက် ကွေး နဲ့ မ မှုတ် နဲ့, အကွာအဝေး မညီ ဖြစ်!'},
+  {t:'🚨 အမှား ၃ မျိုး နဲ့ ဖြေရှင်းနည်း',d:[
+   '<b>၁။ Mottle (အကွက်ထင်ခြင်း):</b> Metallic/pearl မညီ — အ ကြောင်း: gun ရပ် ရပ် သွား / coat မညီ။ ဖြေရှင်းနည်း: ပါး ပါး "drop coat" တစ် ထပ် ညီညီ ထပ် မှုတ်။',
+   '<b>၂။ Orange peel (လိမ္မော်ခွံလို):</b> မျက် နှာ ပြင် ကြမ်း — အ ကြောင်း: ဆေး ပျစ် / gun ဝေး / လေ ဖိ အား နည်း။ ဖြေရှင်းနည်း: thinner နည်း နည်း ထပ်, ဖိ အား တင်။',
+   '<b>၃။ Runs/Sags (ဆေးယိုခြင်း):</b> ဆေး စီး ကျ — အ ကြောင်း: ထူ လွန်း / နီး လွန်း / နှေး လွန်း။ ဖြေရှင်းနည်း: ခြောက် အောင် စောင့် → ကော် ပတ် စား → ပြန် မှုတ်။']}
+ ],
+ quiz:[
+  {q:'ဆေး အသစ် စပ် ပြီးရင် အရင် ဘာ လုပ် ရ မလဲ?',a:['တန်း မှုတ်','Test panel မှာ စမ်း','Customer ကို ပြ'],c:1},
+  {q:'Gun မှုတ် တော့ overlap ဘယ် လောက် ထား လဲ?',a:['25%','50%','100%'],c:1},
+  {q:'Runs (ဆေးယို) ဖြစ် ရင် အ ကြောင်း အရင်း?',a:['Coat ထူ လွန်း','Gun ဝေး လွန်း','ဆေး ပါး လွန်း'],c:0}
+ ]},
+{icon:'🎓',mm:'Level 5 — Pro',en:'Professional Skills',
+ intro:'နောက် ဆုံး Level! ဒီ မှာ သင် တာ တွေ က နှစ် ချီ အတွေ့အကြုံ ရှိ တဲ့ ဆရာ တွေ ရဲ့ လျှို့ဝှက်ချက် တွေ!',
+ lessons:[
+  {t:'👁️ Eye-match နည်း',d:[
+   'Code မ ရှိ / sticker ပျောက် တဲ့ ဘီး ဆို <b>မျက်စိ နဲ့ ညှိ</b> ရ တယ် — Pro တိုင်း တတ် ကို တတ် ရ မဲ့ ပညာ!',
+   'နည်း: (1) မူရင်း အရောင် ကို <b>နေ ရောင် (daylight)</b> အောက် မှာ ကြည့် — မီးချောင်း အောက် မ ကြည့် နဲ့, အရောင် လွဲ! (2) အနီး စပ် ဆုံး formula နဲ့ test card စပ် (3) ယှဉ် → လို တာ ထပ် → ထပ် စမ်း။',
+   'ဘာ လို နေ လဲ သိ အောင်: "စိမ်း ဆန် နေ" → အစိမ်း ထပ်, "ရင့် နေ" → အမည်း လျှော့, "ဖျော့ နေ" → အဖြူ လျှော့။'],
+   tip:'မနက် ၁၀ နာရီ / ညနေ ၃ နာရီ နေ ရောင် က အရောင် ကြည့် လို့ အ ကောင်း ဆုံး!'},
+  {t:'🌅 Blend / Fade-out',d:[
+   'ဘီး တစ် ခြမ်း ပဲ ပြင် တော့ အသစ် နဲ့ အဟောင်း <b>အကူး မသိ</b> အောင် ဆက် စပ် ရ တယ် — ဒါ ကို blend လို့ ခေါ်။',
+   'နည်း: အသစ် ဆေး ကို ပြင် တဲ့ နေ ရာ မှာ အပြည့် မှုတ် → အနား သတ် မှာ <b>ပါး ပါး လေး မှုတ်</b> ပြီး ဟောင်း ထဲ "ပျောက်" သွား စေ → clear တစ် စီး လုံး (သို့) panel အပြည့်။',
+   'Blender thinner ရှိ ရင် အကူး ကို ထပ် ချော စေ — ဆိုင် ကြီး တွေ သုံး!'],
+   tip:'Blend ကို panel အနား သတ် / အကွေ့ မှာ လုပ် — မျက် စိ က အကွေ့ မှာ အရောင် ကွာ တာ သတိ ထား မိ နည်း!'},
+  {t:'💎 Pearl & Candy Pro နည်း',d:[
+   'Pearl mid-coat: <b>ထပ် ရေ ကို မှတ် ထား</b> — ဘီး တစ် စီး လုံး တူ တူ ထပ် ရေ မှုတ် မှ အရောင် ညီ! တစ် ခြမ်း ၂ ထပ်, တစ် ခြမ်း ၃ ထပ် ဆို ကွာ ပြီ။',
+   'Candy: transparent ဆေး မို့ <b>base ငွေရောင် ညီ မှ</b> အရောင် လှ — base မညီ ရင် candy လည်း မညီ။',
+   'Coat ကြား <b>flash time</b> စောင့် (၅-၁၀ မိနစ်) — မ စောင့် ပဲ ထပ် မှုတ် ရင် ပူ ဖောင်း/အကွက်!'],
+   warn:'Pearl/Candy ပြန် ပြင် ခက် — အစ က တည်း က သေ ချာ မှုတ်!'},
+  {t:'⬛ Matte Pro ကိုင်တွယ်မှု',d:[
+   'Matte က <b>polish, compound, wax</b> — ၃ ခု လုံး <b>လုံး ဝ မ ထိ ရ!</b> ထိ မိ ရင် တောက် ပ ကွက် ထင် → ပြန် ပြင် လို့ မ ရ!',
+   'သန့် ရှင်း ရေး: ရေ + ဆပ် ပြာ ပျော့ ပဲ — စက် နဲ့ မပွတ် နဲ့။',
+   'Customer ကို ကြို ပြော ထား: "Matte က ဂရု စိုက် ရ တယ်" — နောက် မှ ပြဿနာ မ တက် အောင်!'],
+   warn:'Matte ပေါ် လက် ရာ ဆီ ထင် ရင် ဆပ် ပြာ နဲ့ ညင် သာ စွာ သုတ် — ပွတ် တိုက် မ ရ!'},
+  {t:'💼 ဆိုင် Tips — ဆရာ စကား',d:[
+   '<b>၁။</b> 😷 ဆေး မှုတ် တိုင်း <b>mask တပ်</b> — ဆေး အငွေ့ က အဆိပ်! အသက် က ပညာ ထက် အရေး ကြီး တယ်။',
+   '<b>၂။</b> စပ် ပြီးသား formula တိုင်း 📓 မှတ်တမ်း မှာ <b>ဓာတ်ပုံ + အချိုး</b> သိမ်း — နောက် တစ် ခေါက် ၅ မိနစ် နဲ့ ပြီးပြီ!',
+   '<b>၃။</b> 🧪 ဘီး ပေါ် မ မှုတ် ခင် <b>test card</b> ပေါ် အရင် စမ်း — နေ အလင်း မှာ ယှဉ် ကြည့်, တူ မှ ဆက် မှုတ်!',
+   '<b>၄။</b> ဆေး ဗူး တွေ ကို နေ ရောင် တိုက် ရိုက် မ ထိ စေ နဲ့, အဖုံး လုံ စေ — ဆေး ကြာ ရှည် ခံ!',
+   '<b>၅။</b> 🔫 မှုတ် ပြီးချင်း <b>သေနတ် ချက်ချင်း ဆေး</b> — ကြာ ရင် ဆေး ခဲ ပြီး သေနတ် ပျက်!'],
+   tip:'ဆရာ ဖြစ် ချင် ရင် သင် ပေး တတ် ရ မယ် — တပည့် တစ် ယောက် မွေး ကြည့်, ကိုယ် တိုင် ပို ကျွမ်း လာ မယ်! 🎓'}
+ ],
+ quiz:[
+  {q:'Eye-match မှာ အရောင် ကြည့် တော့ ဘာ အလင်း နဲ့ ကြည့် လဲ?',a:['မီးချောင်း','နေ့အလင်း (daylight)','ဖုန်း flash'],c:1},
+  {q:'Blend လုပ် တာ ရဲ့ ရည်ရွယ်ချက်?',a:['အကူး မသိသာအောင်','ဆေး ချွေတာဖို့','မြန်မြန် ပြီးဖို့'],c:0},
+  {q:'Matte ဆေး မှာ ဘာ လုံး ဝ မ လုပ် ရ?',a:['မှုတ်','Polish','Clear'],c:1}
+ ]}
+];
+function getSch(){try{return Object.assign({done:{},quiz:{}},JSON.parse(localStorage.getItem('pm_school')||'{}'))}catch(e){return{done:{},quiz:{}}}}
+function setSch(s){localStorage.setItem('pm_school',JSON.stringify(s))}
+function schProg(i){
+  const L=SCHOOL[i],sc=getSch();let d=0;
+  L.lessons.forEach((l,j)=>{if(sc.done[i+'-'+j])d++;});
+  return{d:d,n:L.lessons.length,q:!!sc.quiz[i]};
+}
+function renderSchool(){
+  $('schoolBody').innerHTML=`<div class="step-title">🎓 ဆေးပညာ</div>
+  <div class="step-sub">ဆရာ နဲ့ အတူ တစ် ဆင့် ချင်း — အခြေခံ က နေ Pro ထိ!</div>
+  ${SCHOOL.map((L,i)=>{const p=schProg(i),all=p.d===p.n&&p.q;
+   return `<button class="lvl-card" onclick="openLevel(${i})">
+    <div class="lvl-ico">${L.icon}</div>
+    <div class="lvl-info"><div class="lvl-t">${L.mm}</div><div class="lvl-e">${L.en}</div>
+    <div class="pbar" style="margin-top:8px"><div style="width:${Math.round(p.d/p.n*100)}%"></div></div>
+    <div class="lvl-p">${p.d}/${p.n} သင်ခန်းစာ${p.q?' · 📝✅':''}</div></div>
+    <div class="lvl-done">${all?'✅':''}</div></button>`;}).join('')}
+  <div class="tip">💡 အကြံ: Level 1 က နေ အစဉ် လိုက် သွား — ပြီးရင် ✅ ပေါ် မယ်!</div>`;
+}
+function openLevel(i){
+  const L=SCHOOL[i],sc=getSch();
+  $('schoolBody').innerHTML=`<button class="back-link" onclick="renderSchool()">← ဆေးပညာ</button>
+  <div class="step-title">${L.icon} ${L.mm}</div><div class="step-sub">${L.en}</div>
+  <div class="tip">👨‍🏫 ${L.intro}</div>
+  <div class="color-list">${L.lessons.map((l,j)=>`<button class="color-btn" onclick="openLesson(${i},${j})">
+   <div class="les-no">${sc.done[i+'-'+j]?'✅':(j+1)}</div>
+   <div class="color-info"><div class="cn">${l.t}</div>${l.type==='mixer'?'<div class="ce">Interactive — ကိုယ် တိုင် စမ်း ကြည့်!</div>':''}</div></button>`).join('')}</div>
+  <button class="btn" onclick="openQuiz(${i})">📝 ${L.mm} စာမေးပွဲ ${sc.quiz[i]?'✅':''}</button>`;
+  window.scrollTo(0,0);
+}
+function openLesson(i,j){
+  const L=SCHOOL[i],l=L.lessons[j],sc=getSch(),done=sc.done[i+'-'+j];
+  let body='';
+  if(l.type==='mixer'){body=`<div class="step-title">${l.t}</div><div class="step-sub">ဘူး ၂ ဘူး ရွေး — ဘာ အရောင် ထွက် လာ မလဲ!</div><div id="mixBox">${schMixerHTML()}</div>
+   <div class="tip">💡 ဆရာ စကား: ဒီ တွဲ ဖက် တွေ အကုန် မှတ် ထား — ဆိုင် မှာ နေ တိုင်း သုံး ရ မယ်!</div>`;}
+  else{
+   body=`<div class="step-title">${l.t}</div>`+l.d.map(p=>`<p class="les-p">${p}</p>`).join('')+
+   (l.tip?`<div class="tip">💡 ${l.tip}</div>`:'')+(l.warn?`<div class="warn">⚠️ ${l.warn}</div>`:'');
+  }
+  const prev=j>0?`<button class="btn ghost" onclick="openLesson(${i},${j-1})">← အရင် သင်ခန်းစာ</button>`:'';
+  const next=j<L.lessons.length-1
+   ?`<button class="btn" onclick="schDone(${i},${j},1)">မှတ် ပြီးပြီ — နောက် →</button>`
+   :`<button class="btn" onclick="schDone(${i},${j},0)">✅ ဒီ Level ပြီးပြီ — စာမေးပွဲ →</button>`;
+  $('schoolBody').innerHTML=`<button class="back-link" onclick="openLevel(${i})">← ${L.mm}</button>${body}
+  ${done?'<div class="tip">✅ ဒီ သင်ခန်းစာ ပြီးပြီ!</div>':''}${prev}${next}`;
+  window.scrollTo(0,0);
+}
+function schDone(i,j,go){
+  const sc=getSch();sc.done[i+'-'+j]=1;setSch(sc);
+  if(go)openLesson(i,j+1);else openQuiz(i);
+}
+function schMixerHTML(){
+  const key=[SM.a,SM.b].sort().join('+'),r=MIXR[key];
+  const row=(which,sel)=>`<div class="mix-row">${CANS5.map(c=>
+   `<button class="mix-can${sel===c[0]?(which==='a'?' sel1':' sel2'):''}" onclick="SM.${which}='${c[0]}';schMix()"><span>${c[1]}</span>${c[2]}</button>`).join('')}</div>`;
+  return `<div class="mix-lbl">ပထမ ဘူး 👇</div>${row('a',SM.a)}
+  <div class="mix-plus">＋</div><div class="mix-lbl">ဒုတိယ ဘူး 👇</div>${row('b',SM.b)}
+  <div class="mix-res"><div class="swatch xl-swatch" style="background:${r[2]}"></div>
+  <div class="mix-name">${r[0]}</div><div class="step-sub">${r[1]} — ${SM.a===SM.b?'တူ တူ ၂ ဘူး = မူရင်း အရောင်':'၂ ရောင် ရော = အသစ်!'}</div></div>`;
+}
+function schMix(){$('mixBox').innerHTML=`<div class="step-title">🧪 စမ်းသပ်ခန်း — ၂ ရောင် ရော ကြည့်!</div><div class="step-sub">ဘူး ၂ ဘူး ရွေး — ဘာ အရောင် ထွက် လာ မလဲ!</div>`+schMixerHTML()+`<div class="tip">💡 ဆရာ စကား: ဒီ တွဲ ဖက် တွေ အကုန် မှတ် ထား — ဆိုင် မှာ နေ တိုင်း သုံး ရ မယ်!</div>`;}
+function openQuiz(i){SQ={i:i,cur:0,score:0};renderQuiz();}
+function renderQuiz(){
+  const L=SCHOOL[SQ.i],q=L.quiz[SQ.cur];
+  $('schoolBody').innerHTML=`<button class="back-link" onclick="openLevel(${SQ.i})">← ${L.mm}</button>
+  <div class="step-title">📝 စာမေးပွဲ — ${L.mm}</div>
+  <div class="step-sub">မေးခွန်း ${SQ.cur+1} / ${L.quiz.length}</div>
+  <div class="quiz-q">${q.q}</div>
+  <div>${q.a.map((a,ix)=>`<button class="quiz-opt" id="qo${ix}" onclick="ansQuiz(${ix})">${a}</button>`).join('')}</div>
+  <div id="qfb"></div>`;
+  window.scrollTo(0,0);
+}
+function ansQuiz(ix){
+  const L=SCHOOL[SQ.i],q=L.quiz[SQ.cur],ok=ix===q.c;
+  if(ok)SQ.score++;
+  document.querySelectorAll('.quiz-opt').forEach((b,bi)=>{
+    b.disabled=true;
+    if(bi===q.c)b.classList.add('qok');else if(bi===ix)b.classList.add('qbad');
+  });
+  $('qfb').innerHTML=`<div class="${ok?'tip':'warn'}">${ok?'✅ မှန် တယ်! တော် တယ်!':'❌ မှာ သွား တယ် — အဖြေမှန်: '+q.a[q.c]}</div>
+  <button class="btn" onclick="nextQuiz()">${SQ.cur<L.quiz.length-1?'နောက် မေးခွန်း →':'အဖြေ ကြည့် →'}</button>`;
+}
+function nextQuiz(){SQ.cur++;if(SQ.cur>=SCHOOL[SQ.i].quiz.length)quizDone();else renderQuiz();}
+function quizDone(){
+  const L=SCHOOL[SQ.i],pass=SQ.score>=2,sc=getSch();
+  if(pass)sc.quiz[SQ.i]=1;setSch(sc);
+  $('schoolBody').innerHTML=`<div class="step-title">📝 ရလဒ် — ${L.mm}</div>
+  <div class="code-card"><div class="lbl">ရမှတ်</div><div class="code" style="font-size:52px">${SQ.score}/${L.quiz.length}</div>
+  <div class="cname">${pass?'🎉 အောင် ပြီ!':'😅 ထပ် ကြိုး စား ကြည့်'}</div></div>
+  ${pass?'<div class="tip">💡 ဒီ Level အောင် ပြီ — နောက် Level ကို သွား လို့ ရ ပြီ!</div>':'<div class="warn">⚠️ ၂ ခု မှန် မှ အောင် တယ် — သင်ခန်းစာ ပြန် ဖတ် ပြီး ပြန် ဖြေ ကြည့်!</div>'}
+  <button class="btn" onclick="openLevel(${SQ.i})">← Level ကို ပြန် သွား</button>
+  ${pass&&SQ.i<SCHOOL.length-1?`<button class="btn ghost" onclick="openLevel(${SQ.i+1})">နောက် Level →</button>`:''}`;
+  window.scrollTo(0,0);
+}
+
+/* ================= TABS ================= */
+function showTab(t,el){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  $('page-find').classList.toggle('active',t==='find');
+  $('page-nb').classList.toggle('active',t==='nb');
+  $('page-recipes').classList.toggle('active',t==='recipes');
+  $('page-school').classList.toggle('active',t==='school');
+  if(t==='nb')renderNb();
+  if(t==='recipes'){if(R.cur)openRecipe(R.cur);else renderRecipes();}
+  if(t==='school')renderSchool();
+}
+
+/* ================= NOTEBOOK ================= */
+function getNb(){try{return JSON.parse(localStorage.getItem('pm_notebook')||'[]')}catch(e){return[]}}
+function setNb(a){localStorage.setItem('pm_notebook',JSON.stringify(a))}
+function renderNb(){
+  const list=getNb(),el=$('nbList');
+  if(!list.length){el.innerHTML=`<div class="empty">📓<br>မှတ်တမ်း မရှိသေးဘူး<br>ကိုယ်တိုင် စပ်ထားတဲ့ formula တွေ ဒီမှာ သိမ်းပါ</div>`;return;}
+  el.innerHTML=list.map((n,i)=>`<div class="nb-item"><div class="t">${esc(n.title)}</div>
+   <div class="m">${esc(n.bike||'')} ${n.colorDesc?'· '+esc(n.colorDesc):''}<br>${esc(n.date||'')}</div>
+   ${n.formula?`<div class="m" style="color:var(--accent)">🧪 ${esc(n.formula)}</div>`:''}
+   ${n.notes?`<div class="m">📝 ${esc(n.notes)}</div>`:''}
+   <div class="acts"><button onclick="openNbForm(${i})">✏️ ပြင်မယ်</button><button class="del" onclick="delNb(${i})">🗑️ ဖျက်မယ်</button></div></div>`).join('');
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function openNbForm(idx,preset){
+  const list=getNb();
+  const n=idx!=null?list[idx]:(preset||{title:'',bike:'',colorDesc:'',formula:'',notes:''});
+  $('nbSheet').innerHTML=`<h2>${idx!=null?'✏️ ပြင်မယ်':'＋ Formula အသစ်'}</h2>
+  <div class="field"><label>အမည် *</label><input id="nfT" value="${esc(n.title)}" placeholder="ဥပမာ: Wave အနီ candy"></div>
+  <div class="field"><label>ဘီး / Model</label><input id="nfB" value="${esc(n.bike)}" placeholder="ဥပမာ: Wave 110i"></div>
+  <div class="field"><label>အရောင်</label><input id="nfC" value="${esc(n.colorDesc)}" placeholder="ဥပမာ: အနီတောက်"></div>
+  <div class="field"><label>🧪 အချိုး (Formula)</label><textarea id="nfF" rows="3" placeholder="ဥပမာ: အနီ 80% + မာရွန် 15% + ပုလဲ 5%">${esc(n.formula)}</textarea></div>
+  <div class="field"><label>📝 မှတ်ချက်</label><textarea id="nfN" rows="2" placeholder="ဥပမာ: 2 coat, matte clear">${esc(n.notes)}</textarea></div>
+  <button class="btn" onclick="saveNb(${idx==null?'null':idx})">💾 သိမ်းမယ်</button>
+  <button class="btn ghost" onclick="closeNb()">မလုပ်တော့ဘူး</button>`;
+  $('nbModal').classList.add('show');
+}
+function saveNb(idx){
+  const t=$('nfT').value.trim();
+  if(!t){alert('အမည် ထည့်ပါ!');return;}
+  const list=getNb();
+  const e={title:t,bike:$('nfB').value.trim(),colorDesc:$('nfC').value.trim(),formula:$('nfF').value.trim(),notes:$('nfN').value.trim(),date:new Date().toLocaleDateString('my-MM')};
+  if(idx==null)list.unshift(e);else list[idx]=e;
+  setNb(list);closeNb();renderNb();
+}
+function delNb(i){if(confirm('ဖျက်မှာ သေချာလား?')){const l=getNb();l.splice(i,1);setNb(l);renderNb();}}
+function closeNb(){$('nbModal').classList.remove('show');}
+$('nbModal').addEventListener('click',e=>{if(e.target.id==='nbModal')closeNb();});
+
+/* ================= INIT ================= */
+if(window.Telegram&&Telegram.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand();}
+render();renderNb();
+</script>
+</body>
+</html>
